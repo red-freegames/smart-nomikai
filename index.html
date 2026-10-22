@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#2b170c">
 <title>スマート飲み会シミュレーター</title>
-<meta name="description" content="お酒の失敗を防ぎつつスマートに飲み会を生き残る啓発型シミュレーションゲーム『酒と泪と男と女〜スマート飲み会シミュレーター〜』">
-<meta property="og:title" content="酒と泪と男と女〜スマート飲み会シミュレーター〜">
+<meta name="description" content="お酒の失敗を防ぎつつスマートに飲み会を生き残る啓発型シミュレーションゲーム『スマート飲み会シミュレーター』">
+<meta property="og:title" content="スマート飲み会シミュレーター">
 <meta property="og:description" content="19時から翌朝8時まで、酔いつぶれずに盛り上げ続けろ。ドリンク・フード・行動の3択で、引き際を見極めるスマート飲み会サバイバル。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://red-freegames.github.io/smart-nomikai/">
@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="RED FREE GAMES">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="酒と泪と男と女〜スマート飲み会シミュレーター〜">
+<meta name="twitter:title" content="スマート飲み会シミュレーター">
 <meta name="twitter:description" content="19時から翌朝8時まで、酔いつぶれずに盛り上げ続けろ。引き際を見極めるスマート飲み会サバイバル。">
 <meta name="twitter:image" content="https://red-freegames.github.io/smart-nomikai/og.png">
 <link rel="canonical" href="https://red-freegames.github.io/smart-nomikai/">
@@ -298,7 +298,7 @@ body.lv3 .sheet .nm,body.lv3 .bubble,body.lv3 .sheet h3{text-shadow:3px 1px 0 rg
 
 <script>
 /* =========================================================
-   酒と泪と男と女〜スマート飲み会シミュレーター〜
+   スマート飲み会シミュレーター
    ========================================================= */
 const app = document.getElementById('app');
 const modal = document.getElementById('modal');
@@ -619,7 +619,7 @@ function show(html, prep) { document.body.classList.toggle('prep', !!prep); app.
 function openModal(html, game) { modal.innerHTML = html; modal.classList.toggle('game', !!game); modal.classList.add('on'); }
 function closeModal() { modal.classList.remove('on'); modal.innerHTML = ''; }
 function header() {
-  return `<div class="noren"><span>酒</span><span>と</span><span>泪</span><span>と</span><span>男</span><span>と</span><span>女</span></div>`;
+  return `<div class="noren"><span>ス</span><span>マ</span><span>ー</span><span>ト</span><span>飲</span><span>み</span><span>会</span></div>`;
 }
 function btn(o, fn, cls) {
   return `<button class="btn ${cls || ''}" data-h="${on(fn)}"><span class="ic">${o.icon}</span><span class="tx">${o.label}<small>${o.sub || ''}</small></span></button>`;
@@ -690,8 +690,8 @@ function screenTitle() {
     ${header()}
     <div class="lanterns"><div class="lantern">酒</div><div class="lantern">処</div></div>
     <div class="title-box">
-      <div class="title-main">酒と泪と<br>男と女</div>
-      <div class="title-sub">〜スマート飲み会シミュレーター〜</div>
+      <div class="title-main">スマート飲み会<br>シミュレーター</div>
+      <div class="title-sub">〜引き際を見極めて、朝まで盛り上げろ！〜</div>
     </div>
     <div class="card">
       <h2>🍻 ステージを選ぶ</h2>
@@ -1110,7 +1110,7 @@ function finish(type) {
   keys.push('general');
   const learn = [...new Set(keys)].slice(0, 4).map(k => `<li><b>${LEARN[k][0]}</b><br>${LEARN[k][1]}</li>`).join('');
 
-  const head = `🍻『酒と泪と男と女〜スマート飲み会シミュレーター〜』\nSTAGE${S.stage + 1}「${st.name}」`;
+  const head = `🍻『スマート飲み会シミュレーター』\nSTAGE${S.stage + 1}「${st.name}」`;
   const shareText = {
     complete: `${head}で朝8時まで完走！🌅完全クリア！\n🏅ランクS\n💯スコア：${yen(score)}（会計×2）`,
     home: `${head}、${clock()}に${S.visited}軒目で帰宅🏠\n🏅ランク${rank}\n💯スコア：${yen(score)}`,
