@@ -1,0 +1,1187 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2b170c">
+<title>スマート飲み会シミュレーター</title>
+<meta name="description" content="お酒の失敗を防ぎつつスマートに飲み会を生き残る啓発型シミュレーションゲーム『酒と泪と男と女〜スマート飲み会シミュレーター〜』">
+<meta property="og:title" content="酒と泪と男と女〜スマート飲み会シミュレーター〜">
+<meta property="og:description" content="19時から翌朝8時まで、酔いつぶれずに盛り上げ続けろ。ドリンク・フード・行動の3択で、引き際を見極めるスマート飲み会サバイバル。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://red-freegames.github.io/smart-nomikai/">
+<meta property="og:image" content="https://red-freegames.github.io/smart-nomikai/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="RED FREE GAMES">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="酒と泪と男と女〜スマート飲み会シミュレーター〜">
+<meta name="twitter:description" content="19時から翌朝8時まで、酔いつぶれずに盛り上げ続けろ。引き際を見極めるスマート飲み会サバイバル。">
+<meta name="twitter:image" content="https://red-freegames.github.io/smart-nomikai/og.png">
+<link rel="canonical" href="https://red-freegames.github.io/smart-nomikai/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=DotGothic16&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --wood:#2b170c; --wood2:#4a2b16; --wood3:#6b3f1f;
+  --paper:#fff4dc; --paper2:#f7e3b8; --ink:#2a160b;
+  --red:#d7263d; --red2:#a3172b; --orange:#f49d37; --yellow:#ffd23f;
+  --green:#2fae66; --blue:#2e86ab; --navy:#1d3557; --pink:#ff6f91; --purple:#7b4fa0;
+  --muted:#8a6a4f; --shadow:0 4px 0 rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--wood);
+  background-image:
+    repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 2px,transparent 2px 46px),
+    repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0 1px,transparent 1px 9px),
+    linear-gradient(180deg,#3a1f0f,#22120a);
+  color:var(--paper); font-family:"M PLUS Rounded 1c",system-ui,sans-serif;
+  min-height:100vh; min-height:100dvh; overflow-x:hidden;
+}
+/* 準備フェーズは夕暮れの街の配色にして、営業中（木目の居酒屋）と見た目で区別する */
+body.prep{background:linear-gradient(180deg,#2c2a5a 0%,#7a3f6b 45%,#f08a4b 100%) fixed}
+#app{max-width:480px;margin:0 auto;padding:0 16px calc(24px + env(safe-area-inset-bottom));min-height:100dvh;position:relative}
+h1,h2,h3{font-family:"Dela Gothic One",sans-serif;font-weight:400;margin:0}
+.dot{font-family:"DotGothic16",monospace}
+
+/* ---------- noren header ---------- */
+.noren{display:flex;gap:4px;justify-content:center;margin:0 -16px 8px}
+.noren span{flex:1;max-width:76px;height:54px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-family:"Dela Gothic One";font-size:22px;border-radius:0 0 8px 8px;box-shadow:inset 0 -6px 0 rgba(0,0,0,.25)}
+.lanterns{display:flex;justify-content:space-between;margin:-6px 4px 0}
+.lantern{width:40px;height:54px;background:radial-gradient(circle at 50% 40%,#ff6b5b,var(--red) 60%,var(--red2));border-radius:45%;
+  position:relative;color:#fff;font-family:"Dela Gothic One";font-size:13px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 22px rgba(255,90,60,.55);animation:swing 3s ease-in-out infinite;transform-origin:50% -10px}
+.lantern::before,.lantern::after{content:"";position:absolute;left:8px;right:8px;height:5px;background:#222;border-radius:2px}
+.lantern::before{top:-2px}.lantern::after{bottom:-2px}
+.lantern:nth-child(2){animation-delay:-1.5s}
+@keyframes swing{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+
+.title-box{text-align:center;padding:10px 0 4px}
+.title-main{font-family:"Dela Gothic One";font-size:34px;line-height:1.15;color:var(--yellow);
+  text-shadow:3px 3px 0 var(--red),6px 6px 0 rgba(0,0,0,.4);letter-spacing:.02em}
+.title-sub{display:inline-block;margin-top:10px;background:var(--paper);color:var(--red);font-weight:800;padding:6px 14px;border-radius:999px;
+  font-size:14px;box-shadow:var(--shadow);transform:rotate(-2deg)}
+
+/* ---------- phase banner ---------- */
+.phase{display:flex;align-items:center;justify-content:center;gap:8px;margin:14px -16px 0;padding:10px 16px;font-weight:800;font-size:13px;letter-spacing:.06em}
+.phase b{font-family:"Dela Gothic One";font-weight:400;font-size:18px;letter-spacing:0}
+.phase.p1{background:rgba(20,18,60,.55);color:#ffe7b0;border-bottom:3px dashed rgba(255,231,176,.5)}
+
+/* ---------- cards & buttons ---------- */
+.card{background:var(--paper);color:var(--ink);border-radius:16px;padding:16px;margin:14px 0;box-shadow:var(--shadow);border:3px solid var(--ink)}
+.card h2{font-size:20px;margin-bottom:6px}
+.card p{margin:6px 0;line-height:1.6;font-size:14px}
+.btn{display:flex;align-items:center;gap:12px;width:100%;text-decoration:none;min-height:58px;padding:12px 16px;margin:10px 0;border:3px solid var(--ink);border-radius:14px;
+  background:var(--paper);color:var(--ink);font:inherit;font-weight:800;font-size:16px;text-align:left;cursor:pointer;box-shadow:var(--shadow);
+  transition:transform .08s, box-shadow .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.35)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn .ic{font-size:28px;line-height:1;flex:none;width:36px;text-align:center}
+.btn .tx{flex:1;min-width:0}
+.btn .tx small{display:block;font-weight:400;font-size:12px;color:var(--muted);margin-top:2px}
+.btn.primary{background:var(--red);color:#fff;justify-content:center;font-family:"Dela Gothic One";font-weight:400;font-size:20px}
+.btn.yellow{background:var(--yellow)}
+.btn.navy{background:var(--navy);color:#fff}
+.btn.navy small{color:#bcd}
+.btn.ghost{background:transparent;color:var(--paper);border-color:var(--paper);box-shadow:none;justify-content:center;min-height:50px}
+.tag{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;background:var(--ink);color:var(--paper);vertical-align:2px;margin-left:4px}
+.tag.fire{background:var(--red);color:#fff}
+@keyframes jitter{0%,100%{transform:translateX(0)}25%{transform:translateX(-1.5px) rotate(-.4deg)}75%{transform:translateX(1.5px) rotate(.4deg)}}
+
+/* ---------- menu items ---------- */
+.menu-note{font-size:12px;color:var(--muted);padding:4px 2px 2px;line-height:1.5}
+.menu-note b{color:var(--red)}
+.sec{font-size:12px;font-weight:800;color:var(--muted);margin:10px 2px 0;display:flex;align-items:center;gap:6px}
+.sec::after{content:"";flex:1;border-top:2px dotted #d6bf98}
+.item{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;padding:7px 10px;margin:6px 0;border:2px solid var(--ink);border-radius:12px;
+  background:#fff;color:var(--ink);font:inherit;text-align:left;cursor:pointer;transition:transform .08s}
+.item:active{transform:scale(.98)}
+.item:disabled{opacity:.4;cursor:not-allowed}
+.item .ic{font-size:26px;flex:none;width:32px;text-align:center}
+.item .nm{flex:1;min-width:0;font-weight:800;font-size:15px}
+.item .fx{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.item .pr{font-family:"DotGothic16";font-size:14px;flex:none;color:var(--red2)}
+.chip{font-size:11px;font-weight:800;padding:1px 6px;border-radius:6px;white-space:nowrap}
+.chip.hu{background:#d8f5e3;color:#1d7a45}.chip.hd{background:#ffe0e0;color:#b3192c}.chip.hq{background:#efe2ff;color:var(--purple)}
+.chip.du{background:#ffe7c7;color:#a2560b}.chip.dd{background:#dceffa;color:#1d6a8c}.chip.dn{background:#eee;color:#777}
+.chip.fu{background:#f2ecd9;color:#6b5a2d}.chip.cy{background:#fff1c9;color:#8a5a00}
+.item.soft{background:#eef8fd}
+.item.cool{background:#eefbf1}
+.item.pass{background:#f4f0e8;border-style:dashed}
+.item.tipsy{background:#ffe1c2;border-color:var(--red);animation:jitter .35s infinite}
+.item.toilet{background:#d9f0fb;border-style:dashed}
+.item.secret{background:#dff5e6}
+
+/* ---------- round progress (酒→フード→行動) ---------- */
+.prog{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:0 0 8px}
+.prog span{text-align:center;font-size:12px;font-weight:800;padding:5px 2px;border-radius:8px;background:rgba(0,0,0,.08);color:var(--muted);position:relative}
+.prog span.done{background:#d8f5e3;color:#1d7a45}
+.prog span.now{background:var(--red);color:#fff;box-shadow:0 0 0 2px var(--ink)}
+.bg-prog .prog span{background:rgba(255,255,255,.08);color:#cdb594}
+.bg-prog .prog span.done{background:rgba(47,174,102,.3);color:#bff5d4}
+.res-line{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:8px 10px;margin:0 0 8px;font-size:13px;line-height:1.5;animation:flash .6s ease}
+.res-line .fx{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+@keyframes flash{0%{background:#fff3b0}100%{background:#fff}}
+
+/* ---------- title: stage select ---------- */
+.stage-btn{position:relative}
+.stage-btn .num{font-family:"Dela Gothic One";font-size:13px;background:var(--red);color:#fff;border-radius:8px;padding:4px 6px;flex:none;width:auto}
+.stars{color:var(--orange);letter-spacing:1px}
+.cleared{position:absolute;top:-10px;right:10px;background:var(--yellow);color:var(--ink);border:2px solid var(--ink);border-radius:999px;
+  font-size:11px;padding:2px 8px;transform:rotate(6deg)}
+details.howto{background:rgba(0,0,0,.25);border:2px dashed rgba(255,244,220,.4);border-radius:14px;padding:12px 14px;margin:14px 0}
+details.howto summary{font-weight:800;cursor:pointer;min-height:32px;display:flex;align-items:center}
+details.howto li{margin:6px 0;font-size:14px;line-height:1.55}
+.notice{font-size:12px;color:#d8bfa0;text-align:center;line-height:1.6;margin-top:18px}
+
+/* ---------- prep ---------- */
+.steps{display:flex;gap:6px;justify-content:center;margin:14px 0 4px}
+.steps i{width:52px;height:8px;border-radius:4px;background:rgba(255,255,255,.25)}
+.steps i.on{background:var(--yellow)}
+.prep-head{text-align:center;margin:8px 0 6px}
+.prep-head .k{font-size:13px;color:var(--yellow);font-weight:800}
+.prep-head h2{font-size:24px;margin-top:4px}
+.prep-head p{font-size:13px;color:#ffeedd;margin:6px 0 0}
+
+/* ---------- game HUD ---------- */
+.hud{position:sticky;top:0;z-index:5;margin:0 -16px;padding:10px 16px 10px;background:linear-gradient(180deg,#1b0e06 88%,rgba(27,14,6,0));}
+.hud-top{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:12px}
+.open-sign{background:var(--paper);color:var(--red);border:2px solid var(--red);font-family:"Dela Gothic One";font-size:12px;padding:1px 8px;border-radius:6px;white-space:nowrap}
+.badge{background:var(--red);color:#fff;font-weight:800;padding:3px 10px;border-radius:999px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clock{font-family:"DotGothic16";font-size:15px;color:var(--yellow);white-space:nowrap}
+.timeline{position:relative;height:6px;border-radius:3px;background:rgba(255,255,255,.12);margin-top:6px;overflow:hidden}
+.timeline i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#3a4fa0,#7b4fa0,#f08a4b,#ffd23f);transition:width .6s}
+.mults{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;font-size:11px}
+.mults span{background:rgba(255,255,255,.08);border:1px solid rgba(255,244,220,.25);border-radius:6px;padding:1px 6px;font-weight:800}
+.mults .bad{color:#ffb38a}.mults .need{color:#9fe8bd}
+.meters{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.meter{position:relative;background:rgba(255,255,255,.06);border:2px solid rgba(255,244,220,.25);border-radius:12px;padding:6px 7px}
+.meter .lb{font-size:11px;font-weight:800;white-space:nowrap}
+.meter .v{font-family:"DotGothic16";font-size:20px;line-height:1.2}
+.bar{position:relative;height:9px;border-radius:6px;background:rgba(0,0,0,.45);overflow:hidden;margin-top:3px}
+.bar>i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;transition:width .6s}
+.bar.hidden{background:repeating-linear-gradient(45deg,#444 0 6px,#333 6px 12px)}
+.bar .mk{position:absolute;top:-2px;bottom:-2px;width:2px;background:#fff;opacity:.9}
+.bar .ghost{position:absolute;top:0;bottom:0;width:3px;background:var(--yellow);box-shadow:0 0 6px var(--yellow)}
+.meter small{display:block;font-size:10px;color:#cdb594;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meter small.warn{color:#ff9d8a;font-weight:800}
+.pop{position:absolute;right:6px;top:4px;font-family:"DotGothic16";font-size:15px;font-weight:700;animation:pop 1.6s ease forwards;pointer-events:none}
+.pop.up{color:#7dffb0}.pop.down{color:#ff8a8a}.pop.q{color:#d9b8ff}
+@keyframes pop{0%{opacity:0;transform:translateY(8px) scale(.8)}15%{opacity:1;transform:translateY(0) scale(1.15)}75%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+.billrow{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px;gap:8px}
+.billrow .dot{font-size:18px;color:var(--yellow)}
+.items{font-size:11px;color:#cdb594;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.scene{display:flex;gap:10px;align-items:flex-end;margin:10px 0 4px}
+.scene .emo{font-size:48px;line-height:1;flex:none;filter:drop-shadow(0 4px 0 rgba(0,0,0,.4))}
+.bubble{position:relative;flex:1;background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:16px;padding:10px 12px;font-size:14px;line-height:1.6;box-shadow:var(--shadow)}
+.bubble::before{content:"";position:absolute;left:-12px;bottom:14px;border:8px solid transparent;border-right-color:var(--ink)}
+.bubble b{color:var(--red)}
+.bg-prog{margin-top:14px}
+
+/* drunk feel (hidden param hint) */
+/* 酔いの予兆（体感レベル1〜3）：画面のフチの色→揺れ→二重に見える＋鼓動 */
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:40;opacity:0;transition:opacity 1.2s, box-shadow 1.2s}
+body.lv1::after{opacity:1;box-shadow:inset 0 0 90px rgba(255,150,60,.35)}
+body.lv2::after{opacity:1;box-shadow:inset 0 0 120px rgba(255,70,50,.5)}
+body.lv3::after{opacity:1;box-shadow:inset 0 0 170px rgba(220,0,40,.7);animation:heart 1.1s ease-in-out infinite}
+body.lv2 .sheet.menu-sheet{animation:sway 3s ease-in-out infinite}
+body.lv3 .sheet.menu-sheet{animation:sway 1.5s ease-in-out infinite}
+body.lv2 #app{filter:saturate(1.2)}
+body.lv3 #app{filter:saturate(1.4) blur(.5px)}
+body.lv3 .sheet .nm,body.lv3 .bubble,body.lv3 .sheet h3{text-shadow:3px 1px 0 rgba(215,38,61,.35)}
+@keyframes sway{0%,100%{transform:translateX(0) rotate(0)}25%{transform:translateX(-3px) rotate(-.6deg)}75%{transform:translateX(3px) rotate(.6deg)}}
+@keyframes heart{0%,100%{opacity:.7}12%{opacity:1}24%{opacity:.8}36%{opacity:1}}
+.voice{display:flex;gap:8px;align-items:center;border-radius:12px;padding:8px 10px;margin:8px 0;font-size:13px;font-weight:800;line-height:1.5;border:2px dashed currentColor}
+.voice.v0{color:#2b7a4b;background:#e8f7ee}.voice.v1{color:#9a5a00;background:#fff3d6}
+.voice.v2{color:#c2410c;background:#ffe6d5}.voice.v3{color:#fff;background:var(--red);border-style:solid;animation:jitter .4s infinite}
+.bg-voice .voice{margin:8px 0 0}
+@media (prefers-reduced-motion:reduce){body.lv2 .sheet.menu-sheet,body.lv3 .sheet.menu-sheet,body.lv3::after,.voice.v3,.lantern,.item.tipsy{animation:none}}
+
+/* ---------- modal ---------- */
+#modal{position:fixed;inset:0;z-index:20;display:none;align-items:flex-end;justify-content:center;background:rgba(10,4,0,.72);padding:12px}
+#modal.on{display:flex}
+/* ゲーム中のポップアップはHUDの下だけを覆い、HUDのHOMEボタンを押せるようにする */
+#modal.game{background:rgba(10,4,0,.4);inset:auto 0 0 0;height:calc(100dvh - 190px)}
+
+/* ===== RED FREE GAMES 共通：HOME・他のゲーム・フッター ===== */
+.home-btn{flex:none;min-height:30px;padding:2px 10px;border-radius:99px;border:2px solid var(--paper);background:var(--wood3);color:var(--paper);
+  font:inherit;font-size:12px;font-weight:900;white-space:nowrap;cursor:pointer}
+.home-btn:active{transform:translateY(1px)}
+.home-ask{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(10,4,0,.78);padding:16px}
+.home-ask.on{display:flex}
+.home-ask .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.home-ask .row .btn{justify-content:center;margin:6px 0}
+.btn.more{background:var(--navy);color:#fff;justify-content:center}
+.rfg-foot{text-align:center;font-size:12px;color:#d8bfa0;margin:18px 0 0;line-height:1.8}
+.rfg-foot a{color:#ffd9a0}
+.prep-home{display:flex;justify-content:flex-start;margin:10px 0 -4px}
+.sheet{width:100%;max-width:448px;background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:20px;padding:14px 14px 10px;
+  box-shadow:0 8px 0 rgba(0,0,0,.4);animation:up .25s ease;max-height:88dvh;overflow:auto}
+.sheet.menu-sheet{max-height:calc(100dvh - 215px);min-height:300px}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.sheet .big{font-size:56px;text-align:center;line-height:1.1}
+.sheet h3{text-align:center;font-size:19px;margin:4px 0 6px}
+.sheet p{font-size:14px;line-height:1.65;margin:8px 0}
+.deltas{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin:10px 0}
+.deltas div{background:#fff;border:2px solid var(--ink);border-radius:10px;padding:6px 6px;text-align:center;font-size:11px;font-weight:800}
+.deltas b{display:block;font-family:"DotGothic16";font-size:17px;font-weight:400;margin-top:2px}
+.deltas span{display:block;font-weight:400;font-size:11px;color:var(--muted)}
+.up{color:var(--green)}.down{color:var(--red)}.q{color:var(--muted)}
+.note{background:#ffe9b8;border-radius:10px;padding:8px 10px;font-size:13px;margin:6px 0}
+.note.bad{background:#ffe0e0}
+.sum-list{margin:6px 0;padding:0;list-style:none}
+.sum-list li{display:flex;gap:8px;align-items:flex-start;background:#fff;border:2px solid var(--ink);border-radius:10px;padding:6px 8px;margin:5px 0;font-size:13px}
+.sum-list .fx{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.sheet.alert{background:var(--red);color:#fff;animation:up .25s ease, shake .4s .25s 2}
+.sheet.alert h3{font-size:22px;color:var(--yellow)}
+.sheet.alert .btn{background:var(--yellow)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px) rotate(-1deg)}75%{transform:translateX(8px) rotate(1deg)}}
+.swap{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0;font-weight:800;font-size:14px;flex-wrap:wrap}
+.swap span{background:#fff;color:var(--ink);border-radius:10px;padding:6px 10px}
+.swap s{opacity:.7}
+.mirror-wrap{display:flex;gap:12px;align-items:center;background:#e9f6fc;border:2px dashed var(--blue);border-radius:14px;padding:8px;margin:8px 0}
+.mirror{width:84px;height:106px;flex:none;border-radius:50% 50% 46% 46%;border:6px solid #b8925a;
+  background:linear-gradient(135deg,#dff3ff,#9fc9e0 60%,#cbe8f7);display:flex;align-items:center;justify-content:center;
+  font-size:44px;position:relative;overflow:hidden;box-shadow:inset 0 0 20px rgba(0,0,0,.2);transition:filter .4s}
+.mirror::after{content:"";position:absolute;top:-40%;left:-60%;width:40%;height:180%;background:rgba(255,255,255,.55);transform:rotate(25deg);animation:shine 1.2s ease}
+@keyframes shine{from{left:-60%}to{left:140%}}
+.mirror.fog{filter:blur(6px)}
+.face-pct{font-family:"DotGothic16";font-size:30px;margin:2px 0}
+.face-pill{display:flex;gap:6px;margin:4px 0}
+.face-pill i{width:20px;height:20px;border-radius:50%;border:2px solid var(--ink);opacity:.25}
+.face-pill i.on{opacity:1;box-shadow:0 0 0 2px #fff,0 0 0 4px var(--ink)}
+
+/* ---------- interval / result ---------- */
+.center{text-align:center}
+.res-title{font-family:"Dela Gothic One";font-size:40px;text-align:center;margin-top:18px;line-height:1.1}
+.res-title.clear{color:var(--yellow);text-shadow:3px 3px 0 var(--red)}
+.res-title.home{color:#9fd8ff;text-shadow:3px 3px 0 var(--navy)}
+.res-title.over{color:#ff8a8a;text-shadow:3px 3px 0 #000}
+.rank{width:96px;height:96px;margin:10px auto;border-radius:50%;background:var(--yellow);color:var(--red);border:4px solid var(--ink);
+  font-family:"Dela Gothic One";font-size:52px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);transform:rotate(-8deg)}
+.score{font-family:"DotGothic16";font-size:38px;color:var(--red);text-align:center}
+.score s{color:var(--muted);font-size:20px;display:block}
+.statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.statgrid div{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:8px 4px;text-align:center;font-size:11px;font-weight:800}
+.statgrid b{display:block;font-family:"DotGothic16";font-size:18px;font-weight:400}
+.learn li{margin:10px 0;line-height:1.6;font-size:14px}
+.learn li b{color:var(--red)}
+.btn.x{background:#000;color:#fff;justify-content:center;font-size:17px}
+.btn.x .ic{font-family:Arial,sans-serif;font-weight:900;font-size:24px}
+.recap{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px}
+.recap span{background:var(--paper2);border:2px solid var(--ink);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:800}
+.route{display:grid;gap:4px;margin:8px 0;font-size:12px}
+.route div{display:flex;justify-content:space-between;gap:6px;background:#fff;border:1px solid #d6bf98;border-radius:8px;padding:4px 8px}
+.route div.cur{border:2px solid var(--red);font-weight:800}
+.route div.past{opacity:.5}
+.route em{font-style:normal;color:var(--muted);white-space:nowrap}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal"></div>
+<!-- HOME：プレイ中は確認してからタイトルへ -->
+<div class="home-ask" id="homeAsk">
+  <div class="sheet">
+    <div class="big">🏠</div>
+    <h3>タイトルに戻りますか？</h3>
+    <p class="center">今夜の飲み会の進行状況は失われます。</p>
+    <div class="row"><button class="btn" id="homeNo">続ける</button><button class="btn primary" id="homeYes">🏠 戻る</button></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   酒と泪と男と女〜スマート飲み会シミュレーター〜
+   ========================================================= */
+const app = document.getElementById('app');
+const modal = document.getElementById('modal');
+const rnd = a => a[Math.floor(Math.random() * a.length)];
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const yen = n => '¥' + Math.round(n).toLocaleString('ja-JP');
+
+/* --- click handler registry --- */
+const H = [];
+const on = fn => { H.push(fn); return H.length - 1; };
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-h]');
+  if (!b || b.disabled) return;
+  const f = H[+b.dataset.h];
+  if (f) f();
+});
+
+/* --- storage (optional, per-viewer) --- */
+function loadClears() { try { return JSON.parse(localStorage.getItem('smartnomi_clears') || '{}'); } catch (e) { return {}; } }
+function saveClear(i, rank) {
+  try { const c = loadClears(); const order = 'CBAS'; if (!c[i] || order.indexOf(rank) > order.indexOf(c[i])) c[i] = rank; localStorage.setItem('smartnomi_clears', JSON.stringify(c)); } catch (e) {}
+}
+
+/* =========================================================
+   DATA
+   ========================================================= */
+/* 準備フェーズ：直前の腹ごしらえ（初期の満腹度が決まる） */
+const PREFOODS = [
+  { id: 'cheese', icon: '🧀', label: '乳製品・チーズ', full: 35, desc: '満腹度35からスタート。1軒目は酔い度の上昇が半分に' },
+  { id: 'ramen', icon: '🍜', label: 'ガッツリラーメン', full: 70, desc: '満腹度70からスタート。お酒の吸収がかなり遅くなる。ただし胃もたれすることも' },
+  { id: 'empty', icon: '🫥', label: 'すきっ腹', full: 0, desc: '満腹度0（空腹）からスタート。お酒がめちゃくちゃ回りやすい' },
+];
+const ITEMS = [
+  { id: 'hepa', icon: '💊', label: 'ヘパリーゼ／ウコン', desc: '飲み会中ずっと、酔い度の上昇を15%カット' },
+  { id: 'water', icon: '💧', label: 'ポケット仕込み水', desc: 'ドリンクメニューに『隠れて水を飲む』が加わる（盛り上がりの下がり方が小さい）。トイレでも飲める' },
+  { id: 'ukon', icon: '🎁', label: '配り用ウコン', desc: 'みんなに配って、盛り上がり +20% でスタート' },
+];
+
+/* ① ドリンク：お酒は盛り上がり↑↑・酔い↑、ソフドリは盛り上がり↓・酔い↓ */
+const DRINKS = [
+  { id: 'nama', icon: '🍺', label: '生ビール（中）', kind: 'alc', d: 14, h: 12, c: 580, msg: 'ジョッキがぶつかる音！やっぱりビールは最高だ。' },
+  { id: 'lemon', icon: '🍋', label: 'レモンサワー', kind: 'alc', d: 11, h: 10, c: 480, msg: 'さっぱりレモンサワー。飲みやすくてスイスイいけちゃう…。' },
+  { id: 'highball', icon: '🥃', label: 'ハイボール', kind: 'alc', d: 12, h: 10, c: 500, msg: 'シュワっと爽快なハイボール。会話も弾む。' },
+  { id: 'hiya', icon: '🍶', label: '日本酒（冷）', kind: 'alc', d: 16, h: 12, c: 700, msg: 'キリッと冷えた日本酒。度数が高いので、少しずつ味わおう。' },
+  { id: 'kan', icon: '♨️', label: '日本酒（燗）', kind: 'alc', d: 17, h: 12, c: 700, msg: '温かいお酒は体に吸収されるのが速い。じんわり回ってくる…。' },
+  { id: 'umeshu', icon: '🍑', label: '梅酒ソーダ', kind: 'alc', d: 10, h: 9, c: 520, msg: '甘酸っぱい梅酒ソーダ。甘いお酒は飲みすぎに注意。' },
+  { id: 'oolonghai', icon: '🧋', label: 'ウーロンハイ', kind: 'alc', d: 11, h: 9, c: 480, msg: '見た目はウーロン茶、中身は焼酎。油断は禁物。' },
+  { id: 'oolong', icon: '🍵', label: 'ウーロン茶', kind: 'soft', d: -3, h: -6, c: 350, msg: 'お酒の合間にウーロン茶。酔いは醒めるが、ちょっとノリが悪く見えたかも。' },
+  { id: 'cola', icon: '🥤', label: 'コーラ', kind: 'soft', d: -2, h: -5, c: 380, msg: 'シュワっとコーラでリセット。「え、もう飲まないの？」の声も…。' },
+  { id: 'water', icon: '💧', label: 'お水（チェイサー）', kind: 'soft', d: -4, h: -8, c: 0, msg: '店員さんに「お水ください」。体はスッキリ、場は少しシラけた。' },
+];
+
+/* ② フード：酔い度↓のメニュー（cool）は満腹度がほとんど上がらない。
+      ガッツリ系は酔い度に影響しないが、満腹度が一気に上がる */
+const FOODS = [
+  { id: 'edamame', icon: '🫛', label: '枝豆', kind: 'food', cool: true, d: -2, h: 0, f: 4, c: 450, msg: '枝豆をつまむ。タンパク質がアルコールの分解を助けてくれる。でもお腹はほとんど膨れない。' },
+  { id: 'tomato', icon: '🍅', label: '冷やしトマト', kind: 'food', cool: true, d: -2, h: 0, f: 4, c: 480, msg: 'みずみずしい冷やしトマト。水分たっぷりで体がスッキリ。お腹にはたまらない。' },
+  { id: 'shijimi', icon: '🥣', label: 'しじみ汁', kind: 'food', cool: true, d: -3, h: -1, f: 5, c: 420, msg: 'しじみ汁をすする。五臓六腑にしみわたる…。腹の足しにはならない。' },
+  { id: 'chazuke', icon: '🍚', label: '〆の茶漬け', kind: 'food', cool: true, d: -4, h: -2, f: 8, c: 650, msg: 'サラサラっと〆の茶漬け。「もう〆？」と言われたが、胃はほっとしている。' },
+  { id: 'karaage', icon: '🍗', label: 'から揚げ', kind: 'food', d: 0, h: 3, f: 35, c: 680, msg: '「から揚げ来たよー！」と取り分け。一気にお腹にたまる。' },
+  { id: 'potato', icon: '🍟', label: 'ポテトフライ', kind: 'food', d: 0, h: 3, f: 30, c: 520, msg: 'みんなでつまむポテト。手が止まらず、お腹がふくれた。' },
+  { id: 'ramen', icon: '🍜', label: '〆のラーメン', kind: 'food', d: 0, h: 2, f: 50, c: 850, msg: 'ズルズルっとラーメン。お腹がパンパンだ…！' },
+  { id: 'yakitori', icon: '🍢', label: '焼き鳥盛り合わせ', kind: 'food', d: 0, h: 4, f: 30, c: 980, msg: '「塩とタレ、どっち派？」で会話が広がる。' },
+  { id: 'sashimi', icon: '🐟', label: '刺身盛り合わせ', kind: 'food', d: 0, h: 4, f: 20, c: 1280, msg: '豪華な舟盛りに歓声。お腹も満たされた。' },
+];
+const NOFOOD = { id: 'nofood', icon: '🙅', label: '今回は頼まない', kind: 'pass', d: 0, h: 0, f: 0, c: 0, msg: 'フードは見送った。' };
+
+/* ③ 行動：成功率の違う3択（酔い度は変わらない）。上がり幅・下がり幅はマイルドに */
+const ACTIONS = [
+  { id: 'listen', icon: '👂', label: '話をちゃんと聞く', kind: 'gamble', rate: 0.9, hWin: 6, hLose: -2, d: 0, c: 0, sub: '{t}の話にしっかり耳を傾ける。安定して少し盛り上がる' },
+  { id: 'photo', icon: '📸', label: '写真を撮る', kind: 'gamble', rate: 0.8, hWin: 8, hLose: -5, d: 0, c: 0, sub: 'みんなの写真を撮る。たまに嫌がられることも' },
+  { id: 'mania', icon: '🤓', label: 'マニアックな話を熱く語る', kind: 'gamble', rate: 0.5, hWin: 11, hLose: -6, d: 0, c: 0, sub: '刺さればウケるが、外すと空気が少し冷える' },
+];
+const SECRET = { id: 'secretwater', icon: '🤫', label: '隠れて水を飲む', kind: 'secret', d: -4, h: -2, c: 0, msg: 'ポケットのペットボトルでこっそり水分補給。誰にも気づかれていない。' };
+
+/* ほろ酔い時、ソフトドリンクの1つと勝手に入れ替わる「気が大きくなった」注文 */
+const TIPSY = [
+  { id: 'jockey', icon: '🍺', label: '店員さーん！中ジョッキ追加！', kind: 'alc', d: 13, h: 6, c: 600, msg: '誰にも頼まれていないのに中ジョッキを追加。気が大きくなっている…。' },
+  { id: 'koime', icon: '🥃', label: 'ハイボール濃いめで！', kind: 'alc', d: 15, h: 6, c: 550, msg: '「濃いめで！」…なぜそんな注文を。' },
+];
+/* 泥酔時、選んだ注文がこれ（判断力が落ちての追加注文）に書き換わる */
+const WORST = [
+  { id: 'sake_more', icon: '🍶', label: '日本酒をもう1合追加', kind: 'worst', d: 18, h: 4, c: 700, msg: '気づけば日本酒をもう1合頼んでいた…。判断力が落ちている。' },
+  { id: 'koime_more', icon: '🥃', label: '濃いめのハイボールを追加', kind: 'worst', d: 16, h: 4, c: 600, msg: '「濃いめで！」と勝手に口が動いていた…。' },
+  { id: 'wine_bottle', icon: '🍷', label: 'ワインをボトルで注文', kind: 'worst', d: 20, h: 5, c: 3000, msg: '気が大きくなってボトルを注文。グラスが空くたびに注がれてしまう…。' },
+];
+
+/* 店が進むごとに 🍺酔いの倍率↑・🎉盛り上がりの倍率↓・次の店へ進むのに必要な盛り上がり↑ */
+const LEVELS = [
+  { d: 1.00, h: 1.00, need: 45 },
+  { d: 1.12, h: 0.90, need: 48 },
+  { d: 1.25, h: 0.80, need: 51 },
+  { d: 1.40, h: 0.70, need: 54 },
+  { d: 1.55, h: 0.62, need: 57 },
+  { d: 1.70, h: 0.55, need: 60 },
+  { d: 1.85, h: 0.50, need: 0 },
+];
+const START_HOUR = 19, END_HOUR = 32; /* 19:00 〜 翌8:00 */
+
+const STAGES = [
+  {
+    name: '男女交えた同期会', short: '同期会', diff: 1, sub: 'チュートリアル', decay: 1.75, startHype: 60, target: '気になる同期',
+    intro: '入社3年目の同期会。気になるあの人も来ている…！まずは乾杯から。',
+    tipsy: [ { id: 'mote', icon: '😎', label: '「俺、実はモテるんだよね」', kind: 'alc', d: 8, h: -10, c: 500, msg: 'ハイボール片手にモテ自慢。女性陣の目が冷ややかだ…。' } ],
+    photo: ['全員の笑顔がそろった奇跡の一枚！グループLINEで大好評。', '半目の写真をグループLINEに投稿してしまい、ブーイング…。'],
+    listen: ['気になる同期の仕事の悩みをじっくり聞いた。「話してよかった」と笑顔に。', 'うなずきすぎて、ちょっと上の空に見えたかも…。'],
+    mania: ['推しのアニメを熱弁したら、まさかの同志が！大盛り上がり。', '鉄道車両の形式について15分語ってしまった。みんなの目が泳いでいる…。'],
+    events: [
+      { who: '🙋', text: '気になる同期が「もう1杯いく？」と聞いてきた！', opts: [
+        { id: 'ev_go', icon: '🍻', label: '「いくいく！」とハイボール', kind: 'alc', d: 12, h: 8, c: 550, msg: 'テンションは上がったが、杯数も上がった。' },
+        { id: 'ev_soft', icon: '🥤', label: '「一緒にソフドリで乾杯しよ」', kind: 'soft', d: -2, h: 7, c: 400, msg: '「いいね、それ」と笑顔。気遣いができる人の印象に！' },
+      ] },
+      { who: '🎲', text: '「王様ゲームやろうぜ！」と誰かが言い出した。', opts: [
+        { id: 'ev_king', icon: '👑', label: '全力で乗っかる', kind: 'act', d: 0, h: 8, c: 0, msg: '王様の命令でモノマネを披露！恥ずかしいけど大ウケ！' },
+        { id: 'ev_mc', icon: '🎤', label: '司会進行役を買って出る', kind: 'act', d: 0, h: 8, c: 0, msg: '飲まずに場を回すポジションを確保。賢い。' },
+      ] },
+    ],
+    venues: [
+      { name: '大衆居酒屋「とりあえず」', emo: '🏮', hours: 2, fee: 0, price: 1, intro: '「とりあえず生で！」の声が響く大衆居酒屋。同期10人が集まった。' },
+      { name: 'カラオケ「マイクの森」', emo: '🎤', hours: 2, fee: 1800, price: 1.1, intro: '2軒目はカラオケ！ルーム料金 ¥1,800。' },
+      { name: 'ダーツバー「BULL」', emo: '🎯', hours: 2, fee: 1000, price: 1.2, intro: '日付が変わる前にダーツバーへ。テーブルチャージ ¥1,000。' },
+      { name: '深夜営業のバル「ミッドナイト」', emo: '🍷', hours: 2, fee: 500, price: 1.1, intro: '終電を逃した組で、朝まで営業のバルへ。お通し ¥500。' },
+      { name: '深夜の焼き鳥屋「夜鳴き」', emo: '🌙', hours: 2, fee: 0, price: 1, intro: '「腹減った！」で深夜営業の焼き鳥屋へ。眠気も襲ってくる…。' },
+      { name: '24時間ファミレス', emo: '🍳', hours: 2, fee: 0, price: 0.9, intro: '始発待ちのファミレス。ドリンクバーの横で、まだ飲む人がいる。' },
+      { name: '朝飲みの立ち飲み屋「朝日屋」', emo: '🌅', hours: 1, fee: 0, price: 0.9, intro: '朝7時。朝から開いている立ち飲み屋に流れ着いた。ラストスパート！' },
+    ],
+  },
+  {
+    name: 'アルハラ部長の歓迎会', short: 'アルハラ部長', diff: 2, sub: 'お酌・飲ませ攻撃をかわせ', decay: 2.5, startHype: 55, target: '部長',
+    intro: '新部署の歓迎会。噂の「とにかく飲ませたがる部長」が待ち構えている…。',
+    tipsy: [ { id: 'tameguchi', icon: '🗯️', label: '部長にタメ口で日本酒をねだる', kind: 'alc', d: 12, h: -12, c: 700, msg: '「てかさ部長〜、もう一本頼んでいい？」…場が凍りついた。' } ],
+    photo: ['部長のベストショットを撮影！「待ち受けにするわ」とご満悦。', '部長の二重あごをアップで撮ってしまった…。無言の圧。'],
+    listen: ['部長の若き日の武勇伝に、しっかり相槌。部長はご満悦だ。', '部長の話の途中でスマホを見てしまった…。'],
+    mania: ['部長も実は釣り好きだった！釣り談義で意気投合。', '昭和プロレスの話を熱く語ったが、部長は野球派だった…。'],
+    events: [
+      { who: '👔', text: '部長「おい、もっと飲め！俺の酒が飲めないのか！」', opts: [
+        { id: 'ev_tsukiau', icon: '🍺', label: '付き合って一杯だけ飲む', kind: 'alc', d: 12, h: 6, c: 0, msg: '部長は満足げ。でも自分のペースは崩れてしまった…。' },
+        { id: 'ev_bukyu', icon: '🎤', label: '「部長の武勇伝、聞きたいです！」と話題を変える', kind: 'act', d: 0, h: 6, c: 0, msg: '部長はご機嫌で語り始めた。お酒の話はどこかへ消えた！' },
+        { id: 'ev_kotowaru', icon: '🍵', label: '「今日はウーロン茶でお付き合いします！」と伝える', kind: 'soft', d: -3, h: -2, c: 0, msg: '部長は一瞬むっとしたが、先輩が「それでいいよ」とフォロー。自分のペースは守れた。' },
+      ] },
+      { who: '🍶', text: '部長が徳利を持ってこちらに来た。「ほら、注いでやる」', opts: [
+        { id: 'ev_ukeru', icon: '🍶', label: 'なみなみ注いでもらって飲む', kind: 'alc', d: 15, h: 6, c: 0, msg: '日本酒がなみなみと…。部長は満足げだ。' },
+        { id: 'ev_kaesu', icon: '🙇', label: '「注がせてください！」と先に注ぎ返す', kind: 'act', d: 0, h: 9, c: 0, msg: '先手必勝！部長の杯を満たし、自分のグラスは守り抜いた。' },
+      ] },
+    ],
+    venues: [
+      { name: '居酒屋「部長行きつけの店」', emo: '🍶', hours: 2, fee: 0, price: 1, intro: '部長行きつけの居酒屋。瓶ビールと徳利がずらりと並ぶ。' },
+      { name: 'バッセン併設の居酒屋', emo: '⚾', hours: 2, fee: 0, price: 1, intro: '部長「よし、打ちながら飲むぞ！」バッセン併設の居酒屋へ。' },
+      { name: 'スナック「ひろみ」', emo: '🎙️', hours: 2, fee: 3000, price: 1.3, intro: '部長行きつけのスナック。セット料金 ¥3,000。ママが笑顔で迎えてくれた。' },
+      { name: 'スナック「夜霧」', emo: '🌫️', hours: 2, fee: 3000, price: 1.3, intro: '部長「もう一軒だけ！」…2軒目のスナックへ。' },
+      { name: 'ラーメン屋で部長とサシ飲み', emo: '🍜', hours: 2, fee: 0, price: 1, intro: '気づけば部長と二人きり。ラーメンと瓶ビールを前に、部長の人生相談が始まった。' },
+      { name: 'オールナイトカラオケ', emo: '🎤', hours: 2, fee: 2500, price: 1.1, intro: '部長「朝まで歌うぞ！」オールナイトパック ¥2,500。' },
+      { name: '早朝の立ち飲み屋', emo: '🌅', hours: 1, fee: 0, price: 0.9, intro: '朝7時。部長はまだ元気だ…。ラストスパート！' },
+    ],
+  },
+  {
+    name: '港区・自称起業家飲み会', short: '港区飲み会', diff: 3, sub: '最難関', decay: 3, startHype: 55, target: '自称起業家',
+    intro: '「年商◯億」の自称起業家たちが集う港区の飲み会。会計もテンションも桁違い…！',
+    tipsy: [ { id: 'kigyo', icon: '💸', label: '「俺も起業する！」とシャンパン追加', kind: 'alc', d: 14, h: 6, c: 8000, msg: '勢いでシャンパンを追加注文。財布が泣いている…。' } ],
+    photo: ['夜景×グラスの最強ショット！「インスタ載せていい？」と大好評。', '「勝手に撮らないで」と言われてしまった…。港区は肖像権に厳しい。'],
+    listen: ['自称起業家の「実は不安でさ…」という本音を、じっくり聞いた。ぐっと打ち解けた。', '相槌が「へえ〜」ばかりで、興味がないのがバレた…。'],
+    mania: ['サウナの「ととのい」理論を熱弁したら、まさかの大ウケ！', '自作PCのメモリの話を熱く語ったが、誰もついてこない…。'],
+    events: [
+      { who: '🍾', text: '「シャンパンタワーやろうぜ！もちろん割り勘ね！」', opts: [
+        { id: 'ev_tower', icon: '🍾', label: 'ノリで乗っかる（割り勘 ¥30,000）', kind: 'alc', d: 15, h: 15, c: 30000, msg: 'タワーが光り輝く！財布は暗く沈んでいく…。' },
+        { id: 'ev_shasin', icon: '📸', label: '「僕、写真係やります！」', kind: 'act', d: 0, h: 8, c: 0, msg: 'インスタ映えする写真を量産。重宝される存在に。' },
+        { id: 'ev_shodan', icon: '📅', label: '「明日朝イチで商談なので」と辞退', kind: 'act', d: 0, h: -5, c: 0, msg: '「意識高いね〜」とイジられたが、財布と肝臓は守った。' },
+      ] },
+      { who: '🕶️', text: '起業家「とりあえず、いいワイン開けようよ！割り勘で！」', opts: [
+        { id: 'ev_wine', icon: '🍷', label: 'グラスで付き合う（割り勘 ¥3,000）', kind: 'alc', d: 14, h: 8, c: 3000, msg: '高級ワインの香りに場が華やぐ。でも度数は高め…。' },
+        { id: 'ev_somm', icon: '🍇', label: '「僕、注ぐ係やります！」とソムリエ役に回る', kind: 'act', d: 0, h: 6, c: 0, msg: '注ぐ側に回って、自分のグラスは控えめに。うまく立ち回った！' },
+      ] },
+    ],
+    venues: [
+      { name: '高級居酒屋「月と六本木」', emo: '🦐', hours: 2, fee: 1500, price: 2.5, intro: '個室の高級居酒屋。お通しだけで ¥1,500。メニューの値段は普段の2.5倍…。' },
+      { name: '会員制バー「NOBODY」', emo: '🥂', hours: 2, fee: 5000, price: 3.5, intro: '暗証番号で入る会員制バー。チャージ ¥5,000。重厚な扉の向こうは別世界。' },
+      { name: 'ラウンジ「HILLS」', emo: '🌃', hours: 2, fee: 10000, price: 4, intro: '夜景を一望するラウンジ。セット料金 ¥10,000。' },
+      { name: 'クラブ「VELVET」', emo: '🪩', hours: 2, fee: 4000, price: 3, intro: '深夜のクラブ。エントランス ¥4,000。爆音で会話もままならない。' },
+      { name: '会員制焼肉「黒毛」', emo: '🥩', hours: 2, fee: 3000, price: 3, intro: '深夜の会員制焼肉店へ。チャージ ¥3,000。肉もお酒も値段が書いていない…。' },
+      { name: 'シーシャバー「煙」', emo: '💨', hours: 2, fee: 3000, price: 2.5, intro: '明け方のシーシャバー。チャージ ¥3,000。みんな目がとろんとしてきた。' },
+      { name: '港区モーニングのカフェバー', emo: '🌅', hours: 1, fee: 0, price: 3, intro: '朝7時、朝日のさすカフェバー。「朝シャン」で締めるのが港区流らしい…。' },
+    ],
+  },
+];
+
+/* =========================================================
+   STATE & ENGINE（UIから独立したゲームロジック）
+   ========================================================= */
+let S = null;
+const stage = () => STAGES[S.stage];
+const venue = () => stage().venues[S.venue];
+const lvl = () => LEVELS[S.venue];
+const TIPSY_AT = 50, RAMP_AT = 75, STEPS = ['drink', 'food', 'act'];
+var SOFT_STREAK_PEN = 3;   // ソフドリ連続時の追加ペナルティ（1杯続くごとに）
+var TIPSY_CHANCE = 0.4;   // 酔い度50%以上のとき、各ターンで「気が大きくなる」確率
+const hopDigest = () => 20 + Math.floor(Math.random() * 11);   // ハシゴの移動で満腹度が20〜30%こなれる
+const fits = food => (food.f || 0) <= 100 - S.full;             // 残りの空き容量に収まるか
+const TURNS_PER_VENUE = 3;   // 1軒につき3ターン（1ターン＝ドリンク→フード→行動）
+const ALC_POWER = 1.0;       // お酒の酔い度上昇の全体倍率（調子に乗るとすぐ限界）
+
+function newRun(i) {
+  S = { stage: i, food: null, item: null, drunk: 0, hype: STAGES[i].startHype, full: 0, bill: 0,
+    round: 0, step: 0, venue: 0, vround: 0, pending: 0, lastCheck: null, checkPending: false,
+    tipsyItem: null, evDone: false, usedEv: [], msg: '', visited: 1, pops: null, roundLog: [], lastRes: null,
+    flags: { toilet: 0, soft: 0, food: 0, cool: 0, alc: 0, emptyAlc: 0, worst: 0, tipsy: 0, rampage: 0, gamble: 0, gambleWin: 0 } };
+}
+
+/* 時刻：1軒＝3ターン×（ドリンク→フード→行動）。店ごとの滞在時間を9等分して進む（5分単位） */
+function minutesAt(vi, vr, step) {
+  const vs = stage().venues;
+  let m = START_HOUR * 60;
+  for (let i = 0; i < Math.min(vi, vs.length); i++) m += vs[i].hours * 60;
+  if (vi < vs.length) m += ((vr || 0) * 3 + (step || 0)) * vs[vi].hours * 60 / 9;
+  return Math.round(m / 5) * 5;
+}
+function clockOf(vi, vr, step) {
+  const m = minutesAt(vi, vr, step), h = Math.floor(m / 60);
+  return (h >= 24 ? '翌' : '') + String(h % 24).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+}
+const clock = () => clockOf(S.venue, S.vround, S.step);
+
+/* 満腹度 → 状態とお酒の回りやすさ */
+function hunger(f) {
+  if (f === undefined) f = S.full;
+  if (f >= 100) return { key: 'full', label: '満腹', icon: '😪', mult: 0.75, col: 'var(--blue)' };
+  if (f >= 60) return { key: 'good', label: '腹八分', icon: '😌', mult: 0.85, col: 'var(--green)' };
+  if (f >= 25) return { key: 'normal', label: 'ふつう', icon: '🙂', mult: 1.0, col: 'var(--yellow)' };
+  return { key: 'empty', label: '空腹', icon: '😫', mult: 1.6, col: 'var(--red)' };
+}
+
+/* 酔い度の増加倍率（店の倍率 × 満腹度 × 腹ごしらえ × アイテム） */
+function mult() {
+  let m = lvl().d * hunger().mult;
+  if (S.food.id === 'cheese' && S.venue < 1) m *= 0.5;
+  if (S.item.id === 'hepa') m *= 0.85;
+  return m;
+}
+const priceOf = cmd => cmd.ev ? (cmd.c || 0) : Math.round((cmd.c || 0) * venue().price / 10) * 10;
+
+/* 1つのコマンドを適用して、変化量を返す */
+function applyCmd(cmd, isEvent) {
+  const b = { d: S.drunk, h: S.hype, f: S.full, c: S.bill, hg: hunger() };
+  let h = cmd.h || 0, msg = cmd.msg || '', gamble = null;
+  if (cmd.kind === 'gamble') {
+    const win = Math.random() < cmd.rate, lines = stage()[cmd.id];
+    h = win ? cmd.hWin : cmd.hLose; msg = win ? lines[0] : lines[1];
+    gamble = win; S.flags.gamble++; if (win) S.flags.gambleWin++;
+  }
+  if (h > 0) h *= lvl().h;                 // 店が進むほど盛り上がりにくい
+  // ソフトドリンクが続くと「またソフドリ？」と場がどんどん冷える（お酒を飲むとリセット）
+  if (cmd.kind === 'soft' || cmd.kind === 'secret') {
+    const pen = (S.softStreak || 0) * SOFT_STREAK_PEN;
+    if (pen) { h -= pen; msg += `<br>「またソフドリ？」と場がシラけた…（${S.softStreak + 1}杯連続：盛り上がり さらに -${pen}%）`; }
+    S.softStreak = (S.softStreak || 0) + 1;
+  } else if (cmd.kind === 'alc' || cmd.kind === 'worst') S.softStreak = 0;
+  let dd = cmd.d || 0;
+  if (dd > 0) {
+    if (b.hg.key === 'empty') S.flags.emptyAlc++;
+    let raw = dd * ALC_POWER * mult();
+    if (S.food.id === 'ramen') { S.pending += raw * 0.4; raw *= 0.55; }
+    dd = raw;
+  }
+  S.drunk = clamp(S.drunk + dd, 0, 100);
+  S.hype = clamp(S.hype + h, 0, 100);
+  S.full = clamp(S.full + (cmd.f || 0), 0, 100);
+  S.bill += priceOf(cmd);
+  const k = cmd.kind;
+  if (k === 'soft' || k === 'secret') S.flags.soft++;
+  if (k === 'food') { S.flags.food++; if (cmd.cool) S.flags.cool++; }
+  if (k === 'alc') S.flags.alc++;
+  if (k === 'worst') S.flags.worst++;
+  if (!isEvent) S.step++;
+  return { cmd, msg, gamble, isEvent, dh: S.hype - b.h, dd: S.drunk - b.d, df: S.full - b.f, dc: S.bill - b.c,
+    hgFrom: b.hg, hgTo: hunger(), emptyDrink: b.hg.key === 'empty' && cmd.d > 0 };
+}
+
+/* 1軒（3ターン）の終わり：代謝・遅延吸収・場の冷え（満腹度は店を移るときだけ下がる） */
+function endRound() {
+  const notes = [], b = { h: S.hype, f: S.full };
+  S.drunk = clamp(S.drunk - 1, 0, 100);   // 時間経過による代謝はごくわずか
+  if (S.pending > 0) {
+    const r = Math.min(S.pending, 6);
+    S.pending -= r; S.drunk = clamp(S.drunk + r, 0, 100);
+    if (r >= 3) notes.push('🍜 ラーメンでせき止められていたアルコールが、じわじわ回ってきた…');
+  }
+  S.hype = clamp(S.hype - stage().decay, 0, 100);
+  if (S.food.id === 'ramen' && S.full >= 50 && Math.random() < 0.15) {
+    S.hype = clamp(S.hype - 8, 0, 100);
+    notes.push('🍜 ラーメンが胃にもたれてテンションダウン…（盛り上がり -8%）');
+  }
+  S.round++; S.vround++; S.step = 0;
+  return { notes, dh: S.hype - b.h, df: S.full - b.f };
+}
+
+/* =========================================================
+   UI HELPERS
+   ========================================================= */
+/* 体感の酔い（本当の酔い度にターンごとのブレ±8を足したもの）。正確な値はトイレの鏡でしかわからない */
+const felt = () => S.drunk + (S.noise || 0);
+const feelLevel = () => { const f = felt(); return f >= 65 ? 3 : f >= 45 ? 2 : f >= 25 ? 1 : 0; };
+const VOICES = [
+  ['まだまだ余裕。頭もスッキリしている。', 'いい感じ。今日は調子がいいぞ。'],
+  ['ちょっと顔が熱くなってきたかも…？', '楽しい！…けど、ペースは大丈夫かな。'],
+  ['視界がふわふわする…。そろそろ水を挟むべきかも。', 'なんでも面白く感じる…これは危ないサインかも。'],
+  ['やばい、天井が回ってる…！これ以上はムリだ…', 'ろれつが回らない…。今すぐ引き際だ！'],
+];
+function voiceHTML() {
+  const lv = feelLevel();
+  return `<div class="voice v${lv}"><span style="font-size:20px">${['😌', '😊', '😵', '🫨'][lv]}</span><span>💭 ${VOICES[lv][S.round % 2]}</span></div>`;
+}
+function setLevel() {
+  document.body.classList.remove('lv1', 'lv2', 'lv3');
+  if (!S || S.end || !S.food) return;
+  const lv = feelLevel();
+  if (lv) document.body.classList.add('lv' + lv);
+}
+function show(html, prep) { document.body.classList.toggle('prep', !!prep); app.innerHTML = html; setLevel(); }
+function openModal(html, game) { modal.innerHTML = html; modal.classList.toggle('game', !!game); modal.classList.add('on'); }
+function closeModal() { modal.classList.remove('on'); modal.innerHTML = ''; }
+function header() {
+  return `<div class="noren"><span>酒</span><span>と</span><span>泪</span><span>と</span><span>男</span><span>と</span><span>女</span></div>`;
+}
+function btn(o, fn, cls) {
+  return `<button class="btn ${cls || ''}" data-h="${on(fn)}"><span class="ic">${o.icon}</span><span class="tx">${o.label}<small>${o.sub || ''}</small></span></button>`;
+}
+function signed(v, unit) {
+  if (Math.abs(v) < 0.5) return `<b class="q">±0${unit}</b>`;
+  return `<b class="${v > 0 ? 'up' : 'down'}">${v > 0 ? '+' : ''}${Math.round(v)}${unit}</b>`;
+}
+function faceOf(v) {
+  if (v < 40) return { emo: '😊', col: 'var(--green)', idx: 0, text: '顔色良好。まだまだ大丈夫そうだ。' };
+  if (v < 70) return { emo: '😳', col: 'var(--yellow)', idx: 1, text: 'ほんのり赤い…。そろそろペースを落とそう。' };
+  return { emo: '🥵', col: 'var(--red)', idx: 2, text: '真っ赤だ！これ以上飲んだらヤバい…！ソフトドリンクに切り替える引き際だ。' };
+}
+/* メニュー項目に効果の向きを示すチップ（酔い度は隠しパラメータなので向きだけ） */
+function chips(cmd) {
+  const c = [];
+  if (cmd.kind === 'gamble') c.push(`<span class="chip hq">成功率 ${Math.round(cmd.rate * 100)}%</span>`, `<span class="chip hu">🎉 成功 +${cmd.hWin}</span>`, `<span class="chip hd">失敗 ${cmd.hLose}</span>`);
+  else if (cmd.kind === 'pass') c.push('<span class="chip dn">変化なし</span>');
+  else {
+    if (cmd.h >= 9) c.push('<span class="chip hu">🎉 ↑↑</span>');
+    else if (cmd.h > 0) c.push('<span class="chip hu">🎉 ↑</span>');
+    else if (cmd.h < 0) c.push('<span class="chip hd">🎉 ↓</span>');
+    if (cmd.d > 0) c.push(`<span class="chip du">🍺 ↑${hunger().key === 'empty' ? '↑ 空腹で回りやすい！' : ''}</span>`);
+    else if (cmd.d < 0) c.push('<span class="chip dd">🍺 ↓</span>');
+    else c.push('<span class="chip dn">🍺 変化なし</span>');
+    if (cmd.f) c.push(`<span class="chip fu">🍽️ +${cmd.f}</span>`);
+  }
+  return c.join('');
+}
+function itemBtn(cmd, fn, cls, disabled) {
+  const p = priceOf(cmd);
+  const tag = cmd.tipsy ? '<span class="tag fire">気が大きく…</span>' : '';
+  const free = ['toilet', 'gamble', 'secret', 'pass', 'act'].includes(cmd.kind);
+  return `<button class="item ${cls || ''}" data-h="${on(fn)}" ${disabled ? 'disabled' : ''}>
+    <span class="ic">${cmd.icon}</span>
+    <span class="nm">${cmd.label}${tag}${cmd.sub ? `<small style="display:block;font-weight:400;font-size:11px;color:var(--muted)">${cmd.sub}</small>` : ''}<span class="fx">${chips(cmd)}</span></span>
+    <span class="pr">${p ? yen(p) : free ? '' : '無料'}</span>
+  </button>`;
+}
+/* 変化量のチップ（酔い度は？？？） */
+function resChips(r) {
+  const c = [];
+  const s = (v, u, up, dn) => Math.abs(v) < 0.5 ? '' : `<span class="chip ${v > 0 ? up : dn}">${v > 0 ? '+' : ''}${Math.round(v)}${u}</span>`;
+  c.push(Math.abs(r.dh) < 0.5 ? '<span class="chip dn">🎉 ±0</span>' : `<span class="chip ${r.dh > 0 ? 'hu' : 'hd'}">🎉 ${r.dh > 0 ? '+' : ''}${Math.round(r.dh)}%</span>`);
+  if (Math.abs(r.dd) >= 1) c.push(`<span class="chip ${r.dd > 0 ? 'du' : 'dd'}">🍺 ${r.dd > 10 ? 'カッと熱い…' : r.dd > 0 ? 'ほんのり回った' : 'スッキリ'}</span>`);
+  if (Math.abs(r.df) >= 1) c.push(`<span class="chip fu">🍽️ ${r.df > 0 ? '+' : ''}${Math.round(r.df)}%</span>`);
+  if (r.dc) c.push(`<span class="chip cy">💴 +${yen(r.dc)}</span>`);
+  return c.join('');
+}
+function progHTML() {
+  const names = ['🍺 ドリンク', '🍢 フード', '🙋 行動'];
+  return `<div class="prog">${names.map((n, i) => `<span class="${i < S.step ? 'done' : i === S.step ? 'now' : ''}">${i < S.step ? '✓ ' : ''}${n}</span>`).join('')}</div>`;
+}
+
+/* =========================================================
+   TITLE
+   ========================================================= */
+function screenTitle() {
+  S = null; closeModal(); document.body.classList.remove('lv1', 'lv2', 'lv3');
+  const clears = loadClears();
+  const stages = STAGES.map((st, i) => `
+    <button class="btn stage-btn" data-h="${on(() => { newRun(i); prepFood(); })}">
+      <span class="num">ST.${i + 1}</span>
+      <span class="tx">${st.name}<small><span class="stars">${'★'.repeat(st.diff)}${'☆'.repeat(3 - st.diff)}</span> ${st.sub} ／ ${st.venues.length}軒・朝8時まで</small></span>
+      ${clears[i] ? `<span class="cleared">BEST ${clears[i]}</span>` : ''}
+    </button>`).join('');
+  show(`
+    ${header()}
+    <div class="lanterns"><div class="lantern">酒</div><div class="lantern">処</div></div>
+    <div class="title-box">
+      <div class="title-main">酒と泪と<br>男と女</div>
+      <div class="title-sub">〜スマート飲み会シミュレーター〜</div>
+    </div>
+    <div class="card">
+      <h2>🍻 ステージを選ぶ</h2>
+      ${stages}
+    </div>
+    <details class="howto">
+      <summary>📖 遊び方（タップで開く）</summary>
+      <ul>
+        <li>飲み会は<b>19:00〜翌朝8:00</b>まで続く。1ターン＝<b>🍺ドリンク → 🍢フード → 🙋行動</b>を1つずつ。1軒につき<b>3ターン</b>遊んだら次の店へハシゴ。</li>
+        <li><b>🙋 行動</b>は「話をちゃんと聞く（成功率90%）」「写真を撮る（80%）」「マニアックな話を熱く語る（50%）」の3択。</li>
+        <li>店が進むほど<b>お酒が回りやすく</b>、<b>盛り上がりにくく</b>なっていく。</li>
+        <li><b>🎉 盛り上がり</b>が店の終わりに<b>必要ライン</b>を下回ると「お開き」で解散。0%になってもその場で解散。</li>
+        <li><b>🍺 酔い度</b>は「？？？」で見えない。100%で<b>酔いつぶれ（スコア0）</b>。ターンの終わりに<b>トイレの鏡</b>で正確に確認できる。画面の色や揺れ、心の声も「そろそろヤバい」のサイン。</li>
+        <li>酔い度が<b>50%を超えると、ときどき気が大きくなり</b>、そのターンのドリンクは「俺、実はモテるんだよね」のような<b>勝手な注文の1択</b>になる。<b>75%を超えると自制が効かなくなり</b>、濃いめのハイボールしか選べない。そうなる前に引き返そう。</li>
+        <li><b>🍽️ 満腹度</b>が低い（空腹）ほどお酒が回りやすい。満腹度は<b>食べたときだけ上がり、店を移っても10%しか下がらない</b>。100%（満腹）になるとその店ではフードを頼めない。</li>
+        <li>酔いを下げるおつまみ（枝豆・しじみ汁など）はお腹がほとんど膨れない。ガッツリ系は満腹度が一気に上がる。</li>
+        <li>スコアは<b>会計の合計</b>。店を移るときに<b>帰宅</b>すればその時点のスコア、<b>朝8時まで完走</b>すれば完全クリアでスコア2倍！</li>
+      </ul>
+    </details>
+    <a class="btn more" href="${RFG_TOP}"><span class="tx" style="flex:none">🎮 他のゲームを見る</span></a>
+    <p class="notice">※このゲームはフィクションです。お酒は20歳になってから。<br>飲酒の強要はアルハラです。飲酒運転は絶対にやめましょう。</p>
+    ${rfgFooter()}
+  `);
+  window.scrollTo(0, 0);
+}
+
+/* =========================================================
+   PHASE 1：準備
+   ========================================================= */
+function prepBanner(n) {
+  return `<div class="prep-home"><button class="home-btn" data-h="${on(screenTitle)}">🏠HOME</button></div>
+    <div class="phase p1">PHASE 1 <b>🌆 準備フェーズ</b></div>
+    <div class="steps">${[1, 2].map(i => `<i class="${i <= n ? 'on' : ''}"></i>`).join('')}</div>`;
+}
+
+function prepFood() {
+  show(`
+    ${prepBanner(1)}
+    <div class="prep-head"><div class="k">STEP 1 ／ 飲み会の1時間前</div><h2>🍽️ 直前の腹ごしらえ</h2><p>お腹の満たされ具合（満腹度）で、お酒の回りやすさが変わる。</p></div>
+    ${PREFOODS.map(f => btn({ icon: f.icon, label: f.label, sub: f.desc }, () => { S.food = f; S.full = f.full; prepItem(); })).join('')}
+    <button class="btn ghost" data-h="${on(screenTitle)}"><span class="tx" style="flex:none">◀ タイトルへ</span></button>
+  `, true);
+  window.scrollTo(0, 0);
+}
+
+function prepItem() {
+  show(`
+    ${prepBanner(2)}
+    <div class="prep-head"><div class="k">STEP 2 ／ 会場へ向かう途中</div><h2>🏪 コンビニ買い出し</h2><p>持ち込めるアイテムは1つだけ。どれにする？</p></div>
+    ${ITEMS.map(it => btn({ icon: it.icon, label: it.label, sub: it.desc }, () => { S.item = it; prepSummary(); })).join('')}
+  `, true);
+  window.scrollTo(0, 0);
+}
+
+function routeHTML() {
+  return `<div class="route">${stage().venues.map((v, i) => {
+    const from = clockOf(i, 0);
+    const L = LEVELS[i];
+    return `<div class="${i === S.venue ? 'cur' : i < S.venue ? 'past' : ''}"><span>${v.emo} ${v.name}</span><em>${from}〜 🍺×${L.d.toFixed(2)} 🎉×${L.h.toFixed(2)}</em></div>`;
+  }).join('')}</div>`;
+}
+
+function prepSummary() {
+  if (S.item.id === 'ukon') S.hype = clamp(S.hype + 20, 0, 100);
+  const st = stage(), hg = hunger();
+  show(`
+    <div class="prep-home"><button class="home-btn" data-h="${on(screenTitle)}">🏠HOME</button></div>
+    <div class="phase p1">PHASE 1 <b>🌆 準備完了！</b></div>
+    <div class="prep-head"><h2>STAGE ${S.stage + 1}<br>${st.name}</h2></div>
+    <div class="card">
+      <p>${st.intro}</p>
+      <div class="recap"><span>${S.food.icon} ${S.food.label}</span><span>${S.item.icon} ${S.item.label}</span></div>
+      <div class="statgrid">
+        <div>🎉 盛り上がり<b>${S.hype}%</b></div>
+        <div>🍽️ 満腹度<b>${S.full}%</b>${hg.icon} ${hg.label}</div>
+      </div>
+      <p style="margin-top:12px;font-weight:800">🗺️ 今夜のルート（翌朝8:00まで）</p>
+      ${routeHTML()}
+      <p>🎯 店の終わりに盛り上がりが<b>必要ライン</b>を下回ると解散。店が進むほどお酒が回りやすく、盛り上がりにくくなる。</p>
+    </div>
+    <button class="btn primary" data-h="${on(() => { S.bill += venue().fee; S.msg = venue().intro; screenGame(); })}"><span class="tx">のれんをくぐる 🏮</span></button>
+  `, true);
+  window.scrollTo(0, 0);
+}
+
+/* =========================================================
+   PHASE 2：営業中（ドリンク → フード → 行動 をポップアップで順番に）
+   ========================================================= */
+function hud() {
+  const st = stage(), v = venue(), L = lvl(), lc = S.lastCheck, hg = hunger(), p = S.pops || {};
+  const need = L.need;
+  const hc = !need || S.hype >= need ? 'var(--green)' : S.hype >= need - 15 ? 'var(--orange)' : 'var(--red)';
+  const pop = (val, unit) => val === undefined ? '' : val === '?' ? '<span class="pop q">？</span>'
+    : Math.abs(val) < 0.5 ? '' : `<span class="pop ${val > 0 ? 'up' : 'down'}">${val > 0 ? '+' : ''}${Math.round(val)}${unit}</span>`;
+  S.pops = null;
+  const prog = Math.min(100, (minutesAt(S.venue, S.vround, S.step) - START_HOUR * 60) / ((END_HOUR - START_HOUR) * 60) * 100);
+  return `<div class="hud">
+    <div class="hud-top"><button class="home-btn" data-h="${on(askHome)}">🏠HOME</button><span class="open-sign">営業中</span><span class="badge">ST.${S.stage + 1} ${st.short}</span><span class="clock">🕖 ${clock()}</span></div>
+    <div class="timeline" title="19:00 → 翌8:00"><i style="width:${prog}%"></i></div>
+    <div class="hud-top" style="margin-top:6px"><span>${v.emo} ${S.venue + 1}軒目：${v.name}</span><span class="dot">ターン ${Math.min(S.vround + 1, TURNS_PER_VENUE)}/${TURNS_PER_VENUE}</span></div>
+    <div class="mults"><span class="bad">🍺回りやすさ ×${L.d.toFixed(2)}</span><span class="bad">🎉盛り上がりやすさ ×${L.h.toFixed(2)}</span>${need ? `<span class="need">次の店へ ${need}%以上</span>` : '<span class="need">最後の店！</span>'}</div>
+    <div class="meters">
+      <div class="meter">${pop(p.h, '')}<div class="lb">🎉 盛り上がり</div><div class="v">${Math.round(S.hype)}%</div>
+        <div class="bar"><i style="width:${S.hype}%;background:${hc}"></i>${need ? `<span class="mk" style="left:${need}%"></span>` : ''}</div>
+        <small class="${need && S.hype < need ? 'warn' : ''}">${!need ? '🌅 あと少し！' : S.hype >= need ? '✅ 次の店OK' : `⚠️ あと${Math.ceil(need - S.hype)}%`}</small></div>
+      <div class="meter">${pop(p.d, '')}<div class="lb">🍺 酔い度</div><div class="v">？？？</div>
+        <div class="bar hidden">${lc ? `<span class="ghost" style="left:calc(${lc.v}% - 1px)"></span>` : ''}</div>
+        <small>${lc ? `🪞 ${lc.v}%（${lc.t}）` : '🪞 未チェック'}</small></div>
+      <div class="meter">${pop(p.f, '')}<div class="lb">🍽️ 満腹度</div><div class="v">${Math.round(S.full)}%</div>
+        <div class="bar"><i style="width:${S.full}%;background:${hg.col}"></i></div>
+        <small class="${hg.key === 'empty' ? 'warn' : ''}">${hg.icon} ${hg.label}</small></div>
+    </div>
+    <div class="billrow"><span class="items">${S.food.icon}${S.item.icon} ${S.item.label}</span><span>会計 <span class="dot">${yen(S.bill)}</span></span></div>
+  </div>`;
+}
+
+/* 背景（HUD＋吹き出し）を描き直す。ポップアップはこの上に重なる */
+function drawBg() {
+  show(`
+    ${hud()}
+    <div class="scene"><div class="emo">${venue().emo}</div><div class="bubble">${S.msg}</div></div>
+    <div class="bg-voice">${voiceHTML()}</div>
+    <div class="bg-prog">${progHTML()}</div>
+    <button class="btn primary" data-h="${on(openStep)}"><span class="tx">メニューを開く</span></button>
+  `);
+}
+
+function screenGame() {
+  window.scrollTo(0, 0);
+  drawBg();
+  openStep();
+}
+
+function openStep() {
+  // ラウンド開始時：割り込みイベント判定と、ほろ酔い時の注文入れ替え
+  if (S.step === 0 && !S.evDone) {
+    S.evDone = true; S.roundLog = [];
+    S.noise = Math.round((Math.random() * 2 - 1) * 8);   // 体感のブレをターンごとに振り直す
+    S.tipsyItem = null;
+    if (S.drunk >= TIPSY_AT && Math.random() < TIPSY_CHANCE) {   // 気が大きくなるかは確率で決まる
+      const t = rnd([...TIPSY, ...(stage().tipsy || [])]);
+      S.tipsyItem = Object.assign({}, t, { tipsy: true });
+      S.flags.tipsy++;
+    }
+    const evs = (stage().events || []).filter(e => !S.usedEv.includes(e.text));
+    if (S.round > 0 && evs.length && Math.random() < 0.1) {
+      const ev = rnd(evs); S.usedEv.push(ev.text);
+      return eventPopup(ev);
+    }
+  }
+  const step = STEPS[S.step], hg = hunger(), st = stage();
+  // 自制が効かない（酔い度75%以上）：ドリンクは選べず、強制的にお酒が選ばれる
+  if (step === 'drink' && S.drunk >= RAMP_AT) return forcedDrink();
+  const banner = S.lastRes ? `<div class="res-line"><b>${S.lastRes.gamble === null ? '' : S.lastRes.gamble ? '🎉成功！' : '💦失敗…'} ${S.lastRes.cmd.icon} ${S.lastRes.cmd.label}</b><br>${S.lastRes.msg}<div class="fx">${resChips(S.lastRes)}</div>
+      ${S.lastRes.emptyDrink ? '<div class="note bad" style="margin:6px 0 0">⚠️ 空腹のまま飲んだので、いつもより強く回った…</div>' : ''}
+      ${S.lastRes.hgTo.key === 'full' && S.lastRes.hgFrom.key !== 'full' ? '<div class="note" style="margin:6px 0 0">😪 満腹になった！しばらくフードは頼めない。</div>' : ''}</div>` : '';
+  let title = '', body = '';
+  if (step === 'drink' && S.tipsyItem) {
+    // 気が大きくなっている（酔い度50%以上）：ドリンクはこの1択しか選べない
+    title = '🔥 気が大きくなってる…！';
+    body = `${voiceHTML()}<div class="menu-note"><b>🔥 気が大きくなって、もうこれしか頼む気にならない…！</b><br>ソフトドリンクも他のお酒も目に入らない。</div>
+      ${itemBtn(Object.assign({}, S.tipsyItem, { sub: '🔒 気が大きくなっているので、これしか選べない' }), () => pick(S.tipsyItem), 'tipsy')}`;
+  } else if (step === 'drink') {
+    title = '🍺 何を飲む？';
+    body = `${voiceHTML()}<div class="menu-note">お酒は<b>盛り上がり↑↑</b>だけど酔い度も上がる。ソフトドリンクは酔いを醒ますが、盛り上がりは下がり、<b>続けるほど場がシラける</b>。${S.softStreak ? `<br><b>⚠️ ソフドリ${S.softStreak}杯連続中…次のソフドリは盛り上がりが さらに -${S.softStreak * SOFT_STREAK_PEN}%</b>` : ''}${hg.key === 'empty' ? '<br><b>⚠️ 空腹なのでお酒がいつもより回りやすい！</b>' : ''}</div>
+      <div class="sec">🍶 お酒</div>${DRINKS.filter(x => x.kind === 'alc').map(x => itemBtn(x, () => pick(x))).join('')}
+      <div class="sec">🥤 ソフトドリンク</div>${DRINKS.filter(x => x.kind === 'soft').map(x => itemBtn(x, () => pick(x), 'soft')).join('')}
+      ${S.item.id === 'water' ? itemBtn(Object.assign({}, SECRET, { sub: 'ポケット仕込み水（盛り上がりの下がり方が小さい）' }), () => pick(SECRET), 'secret') : ''}`;
+  } else if (step === 'food') {
+    title = '🍢 何を食べる？';
+    const room = 100 - S.full;
+    // 残りの空き容量を超えるメニューは「お腹いっぱいで食べられない」
+    const foodBtn = (x, cls) => !fits(x)
+      ? itemBtn(Object.assign({}, x, { sub: `🈵 お腹いっぱいで食べられない（あと${Math.round(room)}%しか入らない）` }), () => {}, cls, true)
+      : itemBtn(x, () => pick(x), cls);
+    body = `<div class="menu-note">${room <= 0 ? '<b>🔒 満腹でもう入らない…。</b>' : `お腹の空き容量は<b>あと ${Math.round(room)}%</b>。空き容量より大きいメニューは頼めない。`}満腹度はこの店にいる間は下がらず、ハシゴの移動で20〜30%こなれる。</div>
+      ${itemBtn(NOFOOD, () => pick(NOFOOD), 'pass')}
+      <div class="sec">💧 酔い度を下げるメニュー（お腹はほとんど膨れない）</div>${FOODS.filter(x => x.cool).map(x => foodBtn(x, 'cool')).join('')}
+      <div class="sec">🍖 ガッツリ系（酔い度には影響なし・満腹度が一気に上がる）</div>${FOODS.filter(x => !x.cool).map(x => foodBtn(x, '')).join('')}`;
+  } else {
+    title = '🙋 どう立ち回る？';
+    body = `<div class="menu-note">お酒を使わずに場を盛り上げる行動。<b>成功率</b>と上がり幅・下がり幅のバランスで選ぼう。酔い度は変わらない。</div>
+      ${ACTIONS.map(a => { const x = Object.assign({}, a, { sub: a.sub.replace('{t}', st.target) }); return itemBtn(x, () => pick(x)); }).join('')}`;
+  }
+  openModal(`<div class="sheet menu-sheet">${progHTML()}${banner}<h3>${title}</h3>${body}</div>`, true);
+  modal.querySelector('.sheet').scrollTop = 0;
+}
+
+function eventPopup(ev) {
+  openModal(`<div class="sheet menu-sheet">
+    <div class="big">${ev.who}</div>
+    <h3>⚡ 割り込みイベント！</h3>
+    <p class="center">${ev.text}</p>
+    ${ev.opts.map(o => { const x = Object.assign({ ev: true }, o); return itemBtn(x, () => pick(x, true)); }).join('')}
+  </div>`, true);
+}
+
+/* 自制が効かないときのドリンクメニュー：選択肢はこの1つだけ */
+const FORCED_DRINK = { id: 'forced_highball', icon: '🥃', label: '濃いめのハイボール', kind: 'worst', d: 18, h: 3, c: 600,
+  msg: '気づけば「濃いめで！」と注文して、飲み干していた…。もう自分では止められない。' };
+
+function forcedDrink() {
+  S.flags.rampage++;
+  openModal(`<div class="sheet menu-sheet alert">
+    ${progHTML()}
+    <div class="big">😵‍💫</div>
+    <h3>頭がクラクラして<br>自制が効かない…！</h3>
+    <p class="center" style="margin:4px 0">ソフトドリンクもお酒も、もう選べない。<br>メニューにはこれしか見えない…。</p>
+    ${itemBtn(Object.assign({}, FORCED_DRINK, { sub: '🔒 自制が効かないので、これを飲むしかない' }), () => doPick(FORCED_DRINK), 'tipsy')}
+  </div>`, true);
+}
+
+/* 自制不能（暴走）判定 → 実行 */
+function pick(cmd, isEvent) {
+  if (cmd.kind === 'food' && !fits(cmd)) return;
+  if (!['toilet', 'worst', 'pass'].includes(cmd.kind) && S.drunk >= RAMP_AT) {
+    let p = 0.45 + (S.drunk - RAMP_AT) * 0.02;
+    if (cmd.kind === 'soft' || cmd.kind === 'food' || cmd.kind === 'secret') p += 0.1;
+    if (Math.random() < Math.min(p, 0.9)) {
+      const w = Object.assign({}, rnd(WORST));
+      S.flags.rampage++;
+      openModal(`<div class="sheet alert">
+        <div class="big">😵‍💫</div>
+        <h3>頭がクラクラして<br>自制が効かない…！</h3>
+        <div class="swap"><span><s>${cmd.icon} ${cmd.label}</s></span>➡<span>${w.icon} ${w.label}</span></div>
+        <p class="center">選んだはずの注文が、勝手に書き換わってしまった…！</p>
+        <button class="btn" data-h="${on(() => doPick(w, isEvent))}"><span class="ic">🍹</span><span class="tx">…頼んでしまった</span></button>
+      </div>`, true);
+      return;
+    }
+  }
+  doPick(cmd, isEvent);
+}
+
+function doPick(cmd, isEvent) {
+  const r = applyCmd(cmd, isEvent);
+  S.lastRes = r; S.roundLog.push(r);
+  S.msg = `<b>${cmd.icon} ${cmd.label}</b><br>${r.msg}`;
+  S.pops = { h: r.dh, d: Math.abs(r.dd) >= 1 ? '?' : undefined, f: r.df };
+  drawBg();
+  if (S.drunk >= 100 || S.hype <= 0) return endNow();
+  if (S.step >= 3) return roundSummary();
+  openStep();
+}
+
+/* 途中で酔いつぶれ／シラけた場合：最後の行動を見せてから終了 */
+function endNow() {
+  const r = S.lastRes, crash = S.drunk >= 100;
+  openModal(`<div class="sheet">
+    <div class="big">${r.cmd.icon}</div><h3>${r.cmd.label}</h3><p>${r.msg}</p>
+    <div class="fx" style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center">${resChips(r)}</div>
+    <div class="note bad">${crash ? '🌀 視界がぐにゃりと歪んだ…。もう立っていられない。' : '🥶 会話が完全に途切れた…。誰かが「…帰る？」とつぶやいた。'}</div>
+    <button class="btn primary" data-h="${on(() => finish(crash ? 'crash' : 'calm'))}"><span class="tx">…</span></button>
+  </div>`, true);
+}
+
+/* 1ターン（ドリンク→フード→行動）の締めくくり */
+function roundSummary() {
+  const from = clockOf(S.venue, S.vround, 0);
+  const log = S.roundLog.slice();
+  const e = endRound();
+  S.lastRes = null; S.evDone = false;
+  S.pops = { h: e.dh, f: e.df };
+  // トイレ（鏡で顔色チェック）は行動コマンドとは別に、ターンの区切りでだけ行ける
+  const mirror = `<div id="mirBox">${btn({ icon: '🚻', label: 'トイレで顔色をチェックする', sub: '鏡で酔い度を正確に確認＆少しスッキリ（席を外すので盛り上がり -3%）' }, checkMirror)}</div>`;
+  const v = venue(), venueEnd = S.vround >= TURNS_PER_VENUE;
+  const over = S.drunk >= 100 || S.hype <= 0;
+  drawBg();
+  openModal(`<div class="sheet menu-sheet">
+    <h3>${v.emo} ターン ${S.vround}/${TURNS_PER_VENUE} 終了</h3><p class="center" style="margin:0;font-size:12px;color:var(--muted)">🕖 ${from}〜${clock()}</p>
+    ${over ? '' : voiceHTML()}
+    <ul class="sum-list">${log.map(r => `<li><span style="font-size:22px">${r.cmd.icon}</span><div><b>${r.isEvent ? '⚡' : ''}${r.cmd.label}</b>${r.gamble === null ? '' : r.gamble ? '（成功）' : '（失敗）'}<div class="fx">${resChips(r)}</div></div></li>`).join('')}</ul>
+    ${mirror}
+    <div class="deltas">
+      <div>⏱️ 時間経過で場が落ち着く${signed(e.dh, '%')}<span>🎉 盛り上がり → ${Math.round(S.hype)}%</span></div>
+      <div>🍽️ 満腹度<b>${Math.round(S.full)}%</b><span>${hunger().icon} ${hunger().label}（移動で20〜30%こなれる）</span></div>
+    </div>
+    ${e.notes.map(n => `<div class="note">${n}</div>`).join('')}
+    ${hunger().key === 'empty' ? '<div class="note bad">😫 お腹が空いている…。次のお酒は回りやすい。</div>' : ''}
+    ${!over && venueEnd ? `<div class="note">${v.emo} 3ターン終了！${v.name}はお開きの時間だ。</div>` : ''}
+    <button class="btn primary" data-h="${on(afterRound)}"><span class="tx">${over ? '…' : venueEnd ? '店を出る ▶' : `ターン ${S.vround + 1} へ ▶`}</span></button>
+  </div>`, true);
+}
+
+function checkMirror() {
+  S.flags.toilet++;
+  const h0 = S.hype;
+  let extra = '';
+  S.drunk = clamp(S.drunk - 1, 0, 100);
+  if (S.item.id === 'water') { S.drunk = clamp(S.drunk - 3, 0, 100); S.flags.soft++; extra = '<div style="font-size:12px">💧 個室でポケットの仕込み水もゴクゴク。</div>'; }
+  S.hype = clamp(S.hype - 3, 0, 100);
+  const v = Math.round(S.drunk), f = faceOf(v);
+  S.lastCheck = { v, t: clock() };
+  S.pops = { h: S.hype - h0 };
+  drawBg();
+  document.getElementById('mirBox').innerHTML = `<div class="mirror-wrap"><div class="mirror fog" id="mir">🫥</div><div id="mirRes" style="flex:1"><b>🚻 鏡で自分の顔を確認した…</b><p style="color:var(--muted);margin:4px 0">曇った鏡を拭いて…</p></div></div>`;
+  setTimeout(() => {
+    const m = document.getElementById('mir'); if (!m) return;
+    m.classList.remove('fog'); m.textContent = f.emo; m.style.background = `radial-gradient(circle at 50% 55%, ${f.col}, #dff3ff 72%)`;
+    document.getElementById('mirRes').innerHTML = `<b>🚻 鏡で自分の顔を確認した…</b>
+      <div class="face-pill"><i style="background:var(--green)" class="${f.idx === 0 ? 'on' : ''}"></i><i style="background:var(--yellow)" class="${f.idx === 1 ? 'on' : ''}"></i><i style="background:var(--red)" class="${f.idx === 2 ? 'on' : ''}"></i></div>
+      <div class="face-pct" style="color:${f.idx === 1 ? '#b88a00' : f.col}">酔い度 ${v}%</div><div style="font-size:13px">${f.text}</div>${extra}`;
+  }, 1000);
+}
+
+function afterRound() {
+  closeModal();
+  if (S.drunk >= 100) return finish('crash');
+  if (S.hype <= 0) return finish('calm');
+  if (S.vround >= TURNS_PER_VENUE) return screenInterval();
+  screenGame();
+}
+
+/* =========================================================
+   INTERVAL（店の移動 / 帰宅）
+   ========================================================= */
+function homeLabel() {
+  const h = Math.floor(minutesAt(S.venue, S.vround, 0) / 60);
+  if (h < 24) return { icon: '🚃', label: '終電で帰る' };
+  if (h < 29) return { icon: '🚕', label: 'タクシーで帰る' };
+  return { icon: '🚃', label: '始発で帰る' };
+}
+
+function screenInterval() {
+  const st = stage();
+  if (S.venue >= st.venues.length - 1) return finish('complete');
+  const v = venue(), L = lvl(), next = st.venues[S.venue + 1], NL = LEVELS[S.venue + 1];
+  if (S.hype < L.need) return finish('calm');
+  const go = () => {
+    const f0 = S.full;
+    S.venue++; S.vround = 0; S.visited++; S.bill += next.fee;
+    S.full = clamp(S.full - hopDigest(), 0, 100);
+    S.pops = { f: S.full - f0 };
+    S.evDone = false; S.lastRes = null;
+    S.msg = `${next.intro}<br><small>🚶 移動でお腹が少しこなれた（満腹度 ${Math.round(f0)}% → ${Math.round(S.full)}%）</small>`;
+    screenGame();
+  };
+  const hl = homeLabel();
+  show(`
+    ${hud()}
+    <div class="card center">
+      <div style="font-size:44px">${v.emo}</div>
+      <h2>${S.venue + 1}軒目、お開き！</h2>
+      <p>${v.name}を後にした。時刻は <b>${clock()}</b>。</p>
+      <p>🎉 盛り上がり <b>${Math.round(S.hype)}%</b>（必要 ${L.need}%）クリア！「次、行こうよ！」と誘われた。</p>
+      <p style="font-size:13px;color:var(--muted)">次の店は 🍺回りやすさ ×${NL.d.toFixed(2)}／🎉盛り上がりやすさ ×${NL.h.toFixed(2)}。酔い度は見えない。行けるかは自分次第…。</p>
+      ${routeHTML()}
+      <p style="font-weight:800">いま帰ればスコア <span class="dot" style="color:var(--red)">${yen(S.bill)}</span></p>
+    </div>
+    ${btn({ icon: next.emo, label: `${S.venue + 2}軒目へ行く`, sub: `${next.name}／${next.fee ? '入店料 ' + yen(next.fee) : '入店料なし'}` }, go, 'yellow')}
+    ${btn({ icon: hl.icon, label: hl.label, sub: 'ここで切り上げる（その時点の会計がスコア）' }, () => finish('home'), 'navy')}
+  `);
+  window.scrollTo(0, 0);
+}
+
+/* =========================================================
+   RESULT
+   ========================================================= */
+const LEARN = {
+  empty: ['空腹時のアルコール吸収', '胃が空っぽだとお酒はすぐ小腸へ流れ込み、一気に吸収されます。今回は空腹のまま飲んだ場面がありました。飲む前・飲みながら何か食べるのが基本です。'],
+  fed: ['「食べながら飲む」の効果', '胃に食べ物があるとお酒が胃にとどまる時間が延び、酔いの上昇がゆるやかになります。ただし吸収が遅れるだけで、後から回ってくる点には注意。'],
+  cool: ['おつまみ選びもスマートに', '枝豆（タンパク質）や冷やしトマト（水分）、〆のお茶漬けのような、体をいたわるメニューを選ぶのも立派な戦略です。'],
+  chaser: ['チェイサーの重要性', 'お酒と同じくらいの量の水をはさむと、ペースが落ちて酔いの上昇がゆるやかに。脱水や翌日の二日酔い予防にもなります。'],
+  nochaser: ['チェイサーゼロは危険信号', '今回は水やソフトドリンクをほとんど挟みませんでした。「1杯飲んだら水を1杯」を合言葉に。'],
+  toilet: ['自分の状態をこまめに確認', '酔いは自覚より進んでいることが多いもの。トイレのついでに顔色や足元をチェックするのはスマートな習慣です。'],
+  notoilet: ['酔いは「自覚」よりも先に進む', '今回は一度も自分の状態を確認しませんでした。自覚症状が出たころには、すでに飲みすぎていることも。'],
+  late: ['長時間の飲酒は「積み重なる」', '体がアルコールを分解できる量には限りがあります。何時間も飲み続けると分解が追いつかず、同じ1杯でもどんどん回りやすくなります。'],
+  worst: ['飲むペースは「先に」決めておく', '酔いが進むと判断力が落ち、追加注文が止まらなくなりがち。「今日は何杯まで」としらふのうちに決めておくのがスマートです。'],
+  rampage: ['酔うと判断力が落ちる', 'アルコールは理性をつかさどる脳の働きを鈍らせます。「もう1杯」の判断は、しらふのうちにルールを決めておくのが正解。'],
+  gamble: ['盛り上げはお酒だけじゃない', '写真や会話は当たり外れがあっても、お酒を増やさずに場を盛り上げられる手段です。'],
+  calm: ['盛り上がりが落ちたら帰りどき', '場が落ち着いてきたのは、みんなが疲れてきたサイン。無理に引き延ばさず解散するのも大人の飲み方です。'],
+  hepa: ['サプリは「補助」にすぎない', 'ドリンク剤やサプリに頼りすぎるのは禁物。酔いを確実に減らす方法は「飲む量を減らすこと」だけです。'],
+  aruhara: ['アルハラは断っていい', '飲酒の強要はハラスメントです。話題をそらす、注ぐ側に回る、ソフトドリンクを頼むのも立派なスキルです。'],
+  minato: ['勢いの注文に注意', '高いお店ほどノリで頼んだ一杯が会計を直撃。自分のペースと予算を守るのが大人のたしなみです。'],
+  home: ['「途中で帰る」は最強のスマートムーブ', '楽しいうちに切り上げるのは、翌日の自分への最高のプレゼント。'],
+  general: ['自分の適量を知っておこう', 'お酒に強いかどうかは体質で大きく違います。無理せず、自分のペースで楽しむのがいちばんです。'],
+};
+
+function finish(type) {
+  S.end = type;
+  setLevel(); closeModal();
+  const st = stage(), d = Math.round(S.drunk), h = Math.round(S.hype);
+  const score = type === 'crash' ? 0 : type === 'complete' ? S.bill * 2 : S.bill;
+  const hours = (minutesAt(S.venue, S.vround, S.step) - START_HOUR * 60) / 60;
+  let rank = '-', rankName = '';
+  if (type !== 'crash') {
+    if (type === 'complete') { rank = 'S'; rankName = '朝まで生き残った飲み会マスター'; }
+    else if (hours >= 9) { rank = 'A'; rankName = '夜更けまで粘ったタフな飲み仲間'; }
+    else if (hours >= 5) { rank = 'B'; rankName = '引き際を知る大人'; }
+    else { rank = 'C'; rankName = '早めに帰って明日に備えた人'; }
+    saveClear(S.stage, rank);
+  }
+  const info = {
+    complete: ['🌅 朝8時まで完走！完全クリア！', `${st.venues[st.venues.length - 1].name}で朝を迎えた。全員で「おつかれさまでした！」。完全クリアボーナスでスコア2倍！`],
+    home: ['🏠 途中で帰宅', `${clock()}、${S.visited}軒目で切り上げて帰宅した。その時点の会計がスコアになる。`],
+    calm: ['🍃 盛り上がりが落ち着いて解散', `${clock()}、場がすっかり落ち着いて「今日はこのへんで」とお開きになった。そこまでの会計がスコア。`],
+    crash: ['🤮 酔いつぶれ GAME OVER', '記憶がない…。気づけば朝。頭はガンガン、スマホには謝罪すべきLINEが山ほど届いていた。スコアは0。'],
+  }[type];
+  const title = { complete: ['PERFECT!!', 'clear'], home: ['おつかれ！', 'home'], calm: ['お開き', 'home'], crash: ['GAME OVER', 'over'] }[type];
+
+  // 本日の学び（そのプレイの行動に合わせて最大4つ）
+  const keys = [];
+  if (type === 'home') keys.push('home');
+  if (type === 'calm') keys.push('calm');
+  keys.push(S.flags.emptyAlc > 0 ? 'empty' : 'fed');
+  keys.push(S.flags.soft >= 3 ? 'chaser' : 'nochaser');
+  if (S.flags.worst > 0) keys.push('worst');
+  if (S.venue >= 3) keys.push('late');
+  if (S.flags.rampage > 0 || S.flags.tipsy > 0) keys.push('rampage');
+  keys.push(S.flags.toilet > 0 ? 'toilet' : 'notoilet');
+  if (S.flags.cool > 0) keys.push('cool');
+  if (S.stage === 1) keys.push('aruhara');
+  if (S.stage === 2) keys.push('minato');
+  if (S.item.id === 'hepa') keys.push('hepa');
+  if (S.flags.gamble > 0) keys.push('gamble');
+  keys.push('general');
+  const learn = [...new Set(keys)].slice(0, 4).map(k => `<li><b>${LEARN[k][0]}</b><br>${LEARN[k][1]}</li>`).join('');
+
+  const head = `🍻『酒と泪と男と女〜スマート飲み会シミュレーター〜』\nSTAGE${S.stage + 1}「${st.name}」`;
+  const shareText = {
+    complete: `${head}で朝8時まで完走！🌅完全クリア！\n🏅ランクS\n💯スコア：${yen(score)}（会計×2）`,
+    home: `${head}、${clock()}に${S.visited}軒目で帰宅🏠\n🏅ランク${rank}\n💯スコア：${yen(score)}`,
+    calm: `${head}、${clock()}に${S.visited}軒目でお開き🍃\n🏅ランク${rank}\n💯スコア：${yen(score)}`,
+    crash: `${head}、${clock()}に${S.visited}軒目で酔いつぶれ…🤮\n💯スコア：¥0（会計${yen(S.bill)}は泡と消えた）`,
+  }[type];
+  const share = () => {
+    const url = location.href.split('#')[0];
+    const q = new URLSearchParams({ text: shareText, url, hashtags: 'スマート飲み会シミュレーター' });
+    window.open('https://twitter.com/intent/tweet?' + q.toString(), '_blank', 'noopener');
+  };
+  const df = faceOf(d);
+
+  show(`
+    ${header()}
+    <div class="res-title ${title[1]}">${title[0]}</div>
+    <div class="card center">
+      <h2>${info[0]}</h2>
+      <p>${info[1]}</p>
+      ${type !== 'crash' ? `<div class="rank">${rank}</div><b>${rankName}</b>` : '<div style="font-size:64px">🛌</div>'}
+      <p style="margin-top:12px;font-weight:800">スコア</p>
+      <div class="score">${type === 'crash' ? `<s>${yen(S.bill)}</s>` : type === 'complete' ? `<s>${yen(S.bill)} × 2</s>` : ''}${yen(score)}</div>
+      <div class="statgrid">
+        <div>🕖 終了時刻<b>${clock()}</b></div>
+        <div>🏮 はしご<b>${S.visited}軒</b></div>
+        <div>🍺 最終酔い度<b style="color:${df.idx === 1 ? '#b88a00' : df.col}">${d}%</b></div>
+        <div>🎉 盛り上がり<b>${h}%</b></div>
+      </div>
+      <div class="recap"><span>STAGE${S.stage + 1} ${st.short}</span><span>${S.food.icon} ${S.food.label}</span><span>${S.item.icon} ${S.item.label}</span>
+        <span>🍶 お酒${S.flags.alc}杯</span><span>💧 ソフドリ${S.flags.soft}回</span><span>🍢 フード${S.flags.food}品</span>
+        <span>🚻 トイレ${S.flags.toilet}回</span><span>😵‍💫 暴走${S.flags.rampage}回</span></div>
+    </div>
+    <div class="card learn">
+      <h2>📝 本日のスマート飲み会ポイント</h2>
+      <ul style="padding-left:18px;margin:6px 0">${learn}</ul>
+    </div>
+    <button class="btn x" data-h="${on(share)}"><span class="ic">𝕏</span><span class="tx">結果をポストする</span></button>
+    ${btn({ icon: '🔁', label: '同じステージに再挑戦' }, () => { newRun(S.stage); prepFood(); }, 'yellow')}
+    ${type !== 'crash' && S.stage < STAGES.length - 1 ? `<button class="btn primary" data-h="${on(() => { newRun(S.stage + 1); prepFood(); })}"><span class="tx">次のステージへ ▶</span></button>` : ''}
+    <a class="btn more" href="${RFG_TOP}"><span class="tx" style="flex:none">🎮 他のゲームを見る</span></a>
+    <button class="btn ghost" data-h="${on(screenTitle)}"><span class="tx" style="flex:none">🏠 HOME（タイトルへ）</span></button>
+    <p class="notice">※お酒は20歳になってから。飲酒運転・飲酒の強要は絶対にやめましょう。</p>
+    ${rfgFooter()}
+  `);
+  window.scrollTo(0, 0);
+}
+
+/* =========================================================
+   RED FREE GAMES 共通：HOME・他のゲーム・フッター・アクセス解析
+   ========================================================= */
+const RFG_TOP = 'https://red-freegames.github.io/';
+function rfgFooter() {
+  return `<p class="rfg-foot">© RED FREE GAMES ・ <a href="${RFG_TOP}privacy.html" target="_blank" rel="noopener">プライバシー</a></p>`;
+}
+/* プレイ中のHOMEは確認してからタイトルへ（進行中のポップアップは閉じずに残す） */
+const homeAsk = document.getElementById('homeAsk');
+function askHome() { homeAsk.classList.add('on'); }
+document.getElementById('homeNo').addEventListener('click', () => homeAsk.classList.remove('on'));
+document.getElementById('homeYes').addEventListener('click', () => { homeAsk.classList.remove('on'); screenTitle(); });
+
+/* アクセス解析（Googleアナリティクス4）。本番（github.io）でだけ計測する。画面には何も出さない */
+const GA_ID = 'G-FC7LD0DJTQ';
+if (GA_ID && /\.github\.io$/.test(location.hostname)) {
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { dataLayer.push(arguments); };
+  gtag('js', new Date()); gtag('config', GA_ID, { page_title: 'スマート飲み会シミュレーター' });
+  const s = document.createElement('script'); s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_ID); document.head.appendChild(s);
+}
+
+screenTitle();
+</script>
+</body>
+</html>
