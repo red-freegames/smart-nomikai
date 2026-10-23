@@ -175,6 +175,32 @@ details.howto li{margin:6px 0;font-size:14px;line-height:1.55}
 @keyframes pop{0%{opacity:0;transform:translateY(8px) scale(.8)}15%{opacity:1;transform:translateY(0) scale(1.15)}75%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
 .billrow{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px;gap:8px}
 .billrow .dot{font-size:18px;color:var(--yellow)}
+/* 現在の合計会計（スコア）：HUDで一番目立たせる */
+.bill-big{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;padding:6px 12px;border-radius:12px;
+  background:linear-gradient(90deg,#3d2a00,#6b4a00);border:2px solid var(--yellow);box-shadow:0 0 14px rgba(255,210,63,.25)}
+.bill-big .lb{font-size:12px;font-weight:900;color:#ffe9a8;white-space:nowrap}
+.bill-big .amt{font-family:"DotGothic16";font-size:28px;color:var(--yellow);text-shadow:0 0 10px rgba(255,210,63,.5);white-space:nowrap}
+.bill-big .amt.bump{animation:bump .6s ease}
+.bill-big .pop{right:auto;left:50%;top:-6px;color:#ffe066;font-size:18px}
+@keyframes bump{0%{transform:scale(1)}30%{transform:scale(1.18)}100%{transform:scale(1)}}
+/* タイトルの目的・ヒント */
+.goal{background:linear-gradient(180deg,#fff4dc,#ffe7b0);color:var(--ink);border:3px solid var(--ink);border-radius:16px;padding:14px 16px;margin:14px 0;box-shadow:var(--shadow)}
+.goal-k{display:inline-block;background:var(--red);color:#fff;font-family:"Dela Gothic One";font-size:15px;padding:3px 12px;border-radius:999px}
+.goal-k.hint{background:var(--navy);margin-top:10px}
+.goal-main{font-family:"Dela Gothic One";font-size:21px;line-height:1.5;margin:8px 0 2px}
+.goal-main b{color:var(--red);font-weight:400}
+.goal-hint{font-size:14px;line-height:1.65;margin:6px 0 0}
+.goal-hint b{color:var(--red)}
+.goal-rule{margin-top:10px;font-size:12px;font-weight:800;background:#fff;border:2px dashed var(--ink);border-radius:10px;padding:6px 8px;line-height:1.6}
+/* リザルト：合計会計をドカンと */
+.bill-hero{margin:6px -4px 4px;padding:14px 8px 16px;border-radius:14px;background:radial-gradient(circle at 50% 30%,#fff7d1,#ffe08a);border:3px solid var(--ink)}
+.bill-hero .k{font-family:"Dela Gothic One";font-size:16px;color:var(--ink)}
+.bill-hero .v{font-family:"DotGothic16";font-size:56px;line-height:1.15;color:var(--red);text-shadow:3px 3px 0 #fff}
+.bill-hero .n{font-size:12px;font-weight:800;color:var(--muted);margin-top:2px}
+.title-rank{font-family:"Dela Gothic One";font-size:24px;color:var(--red);margin-top:4px}
+.rank-ladder{display:grid;gap:3px;margin:10px 0 0;font-size:11px;text-align:left}
+.rank-ladder div{display:flex;justify-content:space-between;padding:3px 8px;border-radius:6px;background:#fff;border:1px solid #e3cfa5}
+.rank-ladder div.on{background:var(--yellow);border-color:var(--ink);font-weight:900}
 .items{font-size:11px;color:#cdb594;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 .scene{display:flex;gap:10px;align-items:flex-end;margin:10px 0 4px}
@@ -207,7 +233,8 @@ body.lv3 .sheet .nm,body.lv3 .bubble,body.lv3 .sheet h3{text-shadow:3px 1px 0 rg
 #modal{position:fixed;inset:0;z-index:20;display:none;align-items:flex-end;justify-content:center;background:rgba(10,4,0,.72);padding:12px}
 #modal.on{display:flex}
 /* ゲーム中のポップアップはHUDの下だけを覆い、HUDのHOMEボタンを押せるようにする */
-#modal.game{background:rgba(10,4,0,.4);inset:auto 0 0 0;height:calc(100dvh - 190px)}
+#modal.game{background:rgba(10,4,0,.4);inset:auto 0 0 0;height:calc(100dvh - var(--hud-h, 190px))}
+#modal.game .sheet.menu-sheet{max-height:calc(100dvh - var(--hud-h, 190px) - 20px);min-height:260px}
 
 /* ===== RED FREE GAMES 共通：HOME・他のゲーム・フッター ===== */
 .home-btn{flex:none;min-height:30px;padding:2px 10px;border-radius:99px;border:2px solid var(--paper);background:var(--wood3);color:var(--paper);
@@ -319,7 +346,7 @@ document.addEventListener('click', e => {
 /* --- storage (optional, per-viewer) --- */
 function loadClears() { try { return JSON.parse(localStorage.getItem('smartnomi_clears') || '{}'); } catch (e) { return {}; } }
 function saveClear(i, rank) {
-  try { const c = loadClears(); const order = 'CBAS'; if (!c[i] || order.indexOf(rank) > order.indexOf(c[i])) c[i] = rank; localStorage.setItem('smartnomi_clears', JSON.stringify(c)); } catch (e) {}
+  try { const c = loadClears(), order = ['C', 'B', 'A', 'S', 'SS']; if (!c[i] || order.indexOf(rank) > order.indexOf(c[i])) c[i] = rank; localStorage.setItem('smartnomi_clears', JSON.stringify(c)); } catch (e) {}
 }
 
 /* =========================================================
@@ -615,7 +642,11 @@ function setLevel() {
   const lv = feelLevel();
   if (lv) document.body.classList.add('lv' + lv);
 }
-function show(html, prep) { document.body.classList.toggle('prep', !!prep); app.innerHTML = html; setLevel(); }
+function show(html, prep) {
+  document.body.classList.toggle('prep', !!prep); app.innerHTML = html; setLevel();
+  // ゲーム中のポップアップはHUDのすぐ下から出す（会計表示を隠さない）
+  const hudEl = app.querySelector('.hud'); if (hudEl) document.documentElement.style.setProperty('--hud-h', (hudEl.offsetHeight - 6) + 'px');
+}
 function openModal(html, game) { modal.innerHTML = html; modal.classList.toggle('game', !!game); modal.classList.add('on'); }
 function closeModal() { modal.classList.remove('on'); modal.innerHTML = ''; }
 function header() {
@@ -692,6 +723,13 @@ function screenTitle() {
     <div class="title-box">
       <div class="title-main">スマート飲み会<br>シミュレーター</div>
       <div class="title-sub">〜引き際を見極めて、朝まで盛り上げろ！〜</div>
+    </div>
+    <div class="goal">
+      <div class="goal-k">🎯 目的</div>
+      <p class="goal-main">酔いつぶれずに場を盛り上げ、<br><b>なるべく高い会計（お会計金額）</b>を目指せ！</p>
+      <div class="goal-k hint">💡 ヒント</div>
+      <p class="goal-hint">高いお酒や料理を注文するほど<b>スコアがアップ</b>！ただし満腹キャパオーバーや泥酔に注意して、うまく<b>ウコンや調整メニュー</b>で生き残ろう。</p>
+      <div class="goal-rule">💴 スコア＝最終的な合計会計金額 ／ 🌅 朝8時まで完走で<b>2倍</b> ／ 🤮 酔いつぶれたら<b>0円</b></div>
     </div>
     <div class="card">
       <h2>🍻 ステージを選ぶ</h2>
@@ -804,7 +842,8 @@ function hud() {
         <div class="bar"><i style="width:${S.full}%;background:${hg.col}"></i></div>
         <small class="${hg.key === 'empty' ? 'warn' : ''}">${hg.icon} ${hg.label}</small></div>
     </div>
-    <div class="billrow"><span class="items">${S.food.icon}${S.item.icon} ${S.item.label}</span><span>会計 <span class="dot">${yen(S.bill)}</span></span></div>
+    <div class="bill-big">${p.c > 0 ? `<span class="pop up">+${yen(p.c)}</span>` : ''}<span class="lb">💴 現在の合計会計<br><span style="font-weight:700;color:#e8c77a">＝スコア</span></span><span class="amt ${p.c > 0 ? 'bump' : ''}">${yen(S.bill)}</span></div>
+    <div class="billrow"><span class="items">${S.food.icon}${S.item.icon} ${S.item.label}</span></div>
   </div>`;
 }
 
@@ -930,7 +969,7 @@ function doPick(cmd, isEvent) {
   const r = applyCmd(cmd, isEvent);
   S.lastRes = r; S.roundLog.push(r);
   S.msg = `<b>${cmd.icon} ${cmd.label}</b><br>${r.msg}`;
-  S.pops = { h: r.dh, d: Math.abs(r.dd) >= 1 ? '?' : undefined, f: r.df };
+  S.pops = { h: r.dh, d: Math.abs(r.dd) >= 1 ? '?' : undefined, f: r.df, c: r.dc };
   drawBg();
   if (S.drunk >= 100 || S.hype <= 0) return endNow();
   if (S.step >= 3) return roundSummary();
@@ -1024,7 +1063,7 @@ function screenInterval() {
     const f0 = S.full;
     S.venue++; S.vround = 0; S.visited++; S.bill += next.fee;
     S.full = clamp(S.full - hopDigest(), 0, 100);
-    S.pops = { f: S.full - f0 };
+    S.pops = { f: S.full - f0, c: next.fee };
     S.evDone = false; S.lastRes = null;
     S.msg = `${next.intro}<br><small>🚶 移動でお腹が少しこなれた（満腹度 ${Math.round(f0)}% → ${Math.round(S.full)}%）</small>`;
     screenGame();
@@ -1070,20 +1109,26 @@ const LEARN = {
   general: ['自分の適量を知っておこう', 'お酒に強いかどうかは体質で大きく違います。無理せず、自分のペースで楽しむのがいちばんです。'],
 };
 
+/* 合計会計（スコア）のランク。base はステージ1の基準額。シミュレーションで調整（伝説は上位約3%） */
+const RANKS = [
+  { id: 'SS', name: '伝説の太客', icon: '👑', base: 60000 },
+  { id: 'S', name: '居酒屋の神', icon: '⛩️', base: 45000 },
+  { id: 'A', name: '常連の上客', icon: '🍶', base: 25000 },
+  { id: 'B', name: 'ほろ酔い会社員', icon: '👔', base: 12000 },
+  { id: 'C', name: 'ポンコツ飲み手', icon: '🫠', base: 0 },
+];
+const RANK_SCALE = [1, 1.25, 3];   // ステージごとの物価の違い（2は1.25倍、港区は3倍）
+
 function finish(type) {
   S.end = type;
   setLevel(); closeModal();
   const st = stage(), d = Math.round(S.drunk), h = Math.round(S.hype);
   const score = type === 'crash' ? 0 : type === 'complete' ? S.bill * 2 : S.bill;
-  const hours = (minutesAt(S.venue, S.vround, S.step) - START_HOUR * 60) / 60;
-  let rank = '-', rankName = '';
-  if (type !== 'crash') {
-    if (type === 'complete') { rank = 'S'; rankName = '朝まで生き残った飲み会マスター'; }
-    else if (hours >= 9) { rank = 'A'; rankName = '夜更けまで粘ったタフな飲み仲間'; }
-    else if (hours >= 5) { rank = 'B'; rankName = '引き際を知る大人'; }
-    else { rank = 'C'; rankName = '早めに帰って明日に備えた人'; }
-    saveClear(S.stage, rank);
-  }
+  // 合計会計（スコア）でランクを決める。ステージごとの物価に合わせて基準額を変える
+  const ladder = RANKS.map(r => ({ ...r, min: Math.round(r.base * RANK_SCALE[S.stage] / 1000) * 1000 }));
+  const R = ladder.find(r => score >= r.min) || ladder[ladder.length - 1];
+  const rank = R.id, rankName = R.name;
+  saveClear(S.stage, rank);
   const info = {
     complete: ['🌅 朝8時まで完走！完全クリア！', `${st.venues[st.venues.length - 1].name}で朝を迎えた。全員で「おつかれさまでした！」。完全クリアボーナスでスコア2倍！`],
     home: ['🏠 途中で帰宅', `${clock()}、${S.visited}軒目で切り上げて帰宅した。その時点の会計がスコアになる。`],
@@ -1111,12 +1156,13 @@ function finish(type) {
   const learn = [...new Set(keys)].slice(0, 4).map(k => `<li><b>${LEARN[k][0]}</b><br>${LEARN[k][1]}</li>`).join('');
 
   const head = `🍻『スマート飲み会シミュレーター』\nSTAGE${S.stage + 1}「${st.name}」`;
-  const shareText = {
-    complete: `${head}で朝8時まで完走！🌅完全クリア！\n🏅ランクS\n💯スコア：${yen(score)}（会計×2）`,
-    home: `${head}、${clock()}に${S.visited}軒目で帰宅🏠\n🏅ランク${rank}\n💯スコア：${yen(score)}`,
-    calm: `${head}、${clock()}に${S.visited}軒目でお開き🍃\n🏅ランク${rank}\n💯スコア：${yen(score)}`,
-    crash: `${head}、${clock()}に${S.visited}軒目で酔いつぶれ…🤮\n💯スコア：¥0（会計${yen(S.bill)}は泡と消えた）`,
+  const how = {
+    complete: '朝8時まで完走！🌅',
+    home: `${clock()}に${S.visited}軒目で帰宅🏠`,
+    calm: `${clock()}に${S.visited}軒目でお開き🍃`,
+    crash: `${clock()}に${S.visited}軒目で酔いつぶれ…🤮`,
   }[type];
+  const shareText = `${head}\n${how}\n💴 合計会計：${yen(score)}${type === 'complete' ? '（完走で2倍！）' : type === 'crash' ? `（会計${yen(S.bill)}は泡と消えた）` : ''}\n🏅 ランク${rank}「${rankName}」`;
   const share = () => {
     const url = location.href.split('#')[0];
     const q = new URLSearchParams({ text: shareText, url, hashtags: 'スマート飲み会シミュレーター' });
@@ -1128,11 +1174,20 @@ function finish(type) {
     ${header()}
     <div class="res-title ${title[1]}">${title[0]}</div>
     <div class="card center">
+      <div class="bill-hero">
+        <div class="k">💴 最終的な合計会計（スコア）</div>
+        <div class="v">${yen(score)}</div>
+        <div class="n">${type === 'complete' ? `会計 ${yen(S.bill)} × 朝まで完走ボーナス2倍！` : type === 'crash' ? `会計 ${yen(S.bill)} → 酔いつぶれのため0円…` : `会計 ${yen(S.bill)}（${type === 'home' ? '途中で帰宅' : 'お開き'}）`}</div>
+      </div>
+      <div class="rank">${rank}</div>
+      <div class="title-rank">${R.icon} ${rankName}</div>
+      <div class="rank-ladder">${ladder.map(r => `<div class="${r.id === rank ? 'on' : ''}"><span>${r.icon} ${r.id}：${r.name}</span><span>${r.min ? yen(r.min) + '〜' : 'それ未満'}</span></div>`).join('')}</div>
+    </div>
+    <button class="btn x" data-h="${on(share)}"><span class="ic">𝕏</span><span class="tx">会計とランクをポストする</span></button>
+    <div class="card center">
       <h2>${info[0]}</h2>
       <p>${info[1]}</p>
-      ${type !== 'crash' ? `<div class="rank">${rank}</div><b>${rankName}</b>` : '<div style="font-size:64px">🛌</div>'}
-      <p style="margin-top:12px;font-weight:800">スコア</p>
-      <div class="score">${type === 'crash' ? `<s>${yen(S.bill)}</s>` : type === 'complete' ? `<s>${yen(S.bill)} × 2</s>` : ''}${yen(score)}</div>
+      ${type === 'crash' ? '<div style="font-size:56px">🛌</div>' : ''}
       <div class="statgrid">
         <div>🕖 終了時刻<b>${clock()}</b></div>
         <div>🏮 はしご<b>${S.visited}軒</b></div>
@@ -1147,7 +1202,6 @@ function finish(type) {
       <h2>📝 本日のスマート飲み会ポイント</h2>
       <ul style="padding-left:18px;margin:6px 0">${learn}</ul>
     </div>
-    <button class="btn x" data-h="${on(share)}"><span class="ic">𝕏</span><span class="tx">結果をポストする</span></button>
     ${btn({ icon: '🔁', label: '同じステージに再挑戦' }, () => { newRun(S.stage); prepFood(); }, 'yellow')}
     ${type !== 'crash' && S.stage < STAGES.length - 1 ? `<button class="btn primary" data-h="${on(() => { newRun(S.stage + 1); prepFood(); })}"><span class="tx">次のステージへ ▶</span></button>` : ''}
     <a class="btn more" href="${RFG_TOP}"><span class="tx" style="flex:none">🎮 他のゲームを見る</span></a>
